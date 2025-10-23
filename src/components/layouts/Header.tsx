@@ -3,12 +3,14 @@ import { MAIN_ROUTES } from "../../constants/routes";
 import { useSmartAccountClient } from "@account-kit/react";
 import { formatAddress } from "../../utils/libs";
 import { Dropdown } from "../ui/Dropdown";
+import { useRoleSignAndLogin } from "@/hooks/useRoleSignAndLogin";
 interface HeaderProps {
   collapsed: boolean;
 }
 
 const Header = ({ collapsed }: HeaderProps) => {
   const { client } = useSmartAccountClient({});
+  const { handleLogout } = useRoleSignAndLogin();
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-40 bg-white shadow-sm border-b border-gray-200 transition-all duration-300 ${
@@ -32,7 +34,7 @@ const Header = ({ collapsed }: HeaderProps) => {
           items={[
             { label: "View profile", onClick: () => alert("View Profile") },
             { label: "Settings", onClick: () => alert("Settings clicked") },
-            { label: "Logout", onClick: () => alert("Logged out!") },
+            { label: "Logout", onClick: () => handleLogout() },
           ]}
         />
       </div>
