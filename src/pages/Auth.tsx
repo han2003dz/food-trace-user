@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { Card, CardDescription, CardHeader } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
@@ -10,23 +11,25 @@ import { cn } from "../utils/libs";
 import { useWalletConnect } from "@/hooks/useWalletConnect";
 import { RoleSelectModal } from "@/components/common/RoleSelectModal";
 import { useRoleSignAndLogin } from "@/hooks/useRoleSignAndLogin";
+import { useGetTotalBatches } from "@/hooks/contracts/useBatches";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const user = useUserStore((s) => s.userDetail);
-  console.log("OK");
+  const user = useUserStore((s: any) => s.userDetail);
   const { connectWallet, isConnecting, isConnected, isAuthenticating } =
     useWalletConnect();
 
-  const { selectRoleAndLogin } = useRoleSignAndLogin();
+  const { selectRoleAndLogin, shouldShowSignPopup, setShouldShowSignPopup } =
+    useRoleSignAndLogin();
 
-  const [showRoleModal, setShowRoleModal] = useState(false);
+  const { batches } = useGetTotalBatches();
+  console.log("batches", batches);
 
   useEffect(() => {
     if (isConnected && !user) {
-      setShowRoleModal(true);
+      setShouldShowSignPopup(true);
     }
-  }, [isConnected, user]);
+  }, [isConnected, user, setShouldShowSignPopup]);
 
   useEffect(() => {
     if (isConnected && user) {
@@ -37,14 +40,14 @@ export default function LoginPage() {
   if (isAuthenticating) return <FullScreenLoader />;
   return (
     <>
-      {showRoleModal && (
+      {shouldShowSignPopup && (
         <RoleSelectModal
-          open={showRoleModal}
-          onClose={() => setShowRoleModal(false)}
+          open={shouldShowSignPopup}
+          onClose={() => setShouldShowSignPopup(false)}
           onSelect={async (role) => {
             await selectRoleAndLogin(role);
-            // setShowRoleModal(false);
-            // navigate("/", { replace: true });
+            setShouldShowSignPopup(false);
+            navigate("/", { replace: true });
           }}
         />
       )}

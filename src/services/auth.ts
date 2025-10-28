@@ -12,16 +12,14 @@ interface LoginRequest {
 }
 
 interface LoginResponse {
-  data: {
-    accessToken: string;
-    user: {
-      _id: string;
-      address: string;
-      username: string;
-      referral_code: string;
-      createdAt: string;
-      updatedAt: string;
-    };
+  access_token: string;
+  user: {
+    _id: string;
+    address: string;
+    username: string;
+    referral_code: string;
+    createdAt: string;
+    updatedAt: string;
   };
 }
 

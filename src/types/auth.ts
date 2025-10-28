@@ -12,9 +12,7 @@ export interface IUser {
   address: string;
   username: string;
   email: string;
-  referral_code: string;
+  role: number;
   createdAt: string;
   updatedAt: string;
-  referred_by: string;
-  referred_by_code: string;
 }

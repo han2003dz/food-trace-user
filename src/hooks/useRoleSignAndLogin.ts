@@ -46,24 +46,23 @@ export const useRoleSignAndLogin = () => {
       setIsSigning(true);
 
       const nonce = await getNonceAsync(address);
-      console.log("nonce", nonce);
       const message = typeof nonce.nonce === "string" ? nonce.nonce : "";
       const signature = await signMessageAsync({ message: message });
-      console.log("signature", signature);
       const loginResponse = await loginToSystem({
         wallet_address: address,
         signature,
         role: roleMap[role] ?? 0,
       });
 
-      if (loginResponse?.data?.accessToken) {
+      if (loginResponse?.access_token) {
         setAuth({
-          tokens: { accessToken: loginResponse.data.accessToken },
+          tokens: { accessToken: loginResponse.access_token },
           address,
         });
       }
 
       const userProfile = await getUserProfile();
+      console.log("userProfile", userProfile);
       setUserDetail(userProfile as IUser);
       setShouldShowSignPopup(false);
     } catch (err: any) {

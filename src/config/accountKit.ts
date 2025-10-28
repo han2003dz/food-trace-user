@@ -30,10 +30,10 @@ if (!USDC_CONTRACT_ADDRESS) {
   throw new Error("VITE_USDC_CONTRACT_ADDRESS is not set");
 }
 
-export const LOTTERY_CONTRACT_ADDRESS = import.meta.env
-  .VITE_LOTTERY_CONTRACT_ADDRESS;
-if (!LOTTERY_CONTRACT_ADDRESS) {
-  throw new Error("VITE_LOTTERY_CONTRACT_ADDRESS is not set");
+export const FOOD_TRACE_CONTRACT_ADDRESS = import.meta.env
+  .VITE_FOOD_TRACE_CONTRACT_ADDRESS;
+if (!FOOD_TRACE_CONTRACT_ADDRESS) {
+  throw new Error("VITE_FOOD_TRACE_CONTRACT_ADDRESS is not set");
 }
 
 export const PAYMASTER_ADDRESS = getAlchemyPaymasterAddress(

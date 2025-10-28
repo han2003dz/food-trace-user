@@ -5,10 +5,13 @@ import { useState } from "react";
 import clsx from "clsx";
 import Sidebar from "./Sidebar";
 import { ProtectedRoute } from "../../providers/ProtectedRoute";
+import { useGetTotalBatches } from "@/hooks/contracts/useBatches";
 
 export default function MainLayout() {
   const [collapsed, setCollapsed] = useState(false);
-
+  const { batches } = useGetTotalBatches();
+  console.log("batches", batches);
+  console.log("OK");
   return (
     <ProtectedRoute>
       <main className="min-h-screen flex flex-col bg-gray-50">
