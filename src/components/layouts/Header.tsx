@@ -1,45 +1,62 @@
-import { Link } from "react-router-dom";
-import { MAIN_ROUTES } from "../../constants/routes";
-import { useSmartAccountClient } from "@account-kit/react";
-import { formatAddress } from "../../utils/libs";
+import { Wallet, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { Button } from "../ui/Button";
+import { cn, formatAddress } from "@/utils/libs";
 import { Dropdown } from "../ui/Dropdown";
 import { useRoleSignAndLogin } from "@/hooks/useRoleSignAndLogin";
+
 interface HeaderProps {
-  collapsed: boolean;
+  sidebarClosed: boolean;
 }
 
-const Header = ({ collapsed }: HeaderProps) => {
-  const { client } = useSmartAccountClient({});
+export const Header = ({ sidebarClosed }: HeaderProps) => {
+  const [isConnected, setIsConnected] = useState(false);
+  const [address, setAddress] = useState("");
   const { handleLogout } = useRoleSignAndLogin();
+  const handleConnect = () => {
+    setIsConnected(true);
+    setAddress("0x9324...761e");
+  };
+
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-40 bg-white shadow-sm border-b border-gray-200 transition-all duration-300 ${
-        collapsed ? "pl-[72px]" : "pl-[250px]"
-      } max-md:pl-0`}
+      className={cn(
+        "h-16 border-b border-border/50 backdrop-blur-xl bg-card/30 flex items-center justify-between px-6 ml-[250px]",
+        sidebarClosed ? "ml-[72px]" : "ml-[250px]"
+      )}
     >
-      <div className="px-6 py-4 flex justify-between items-center">
-        <Link to={MAIN_ROUTES.HOME} className="text-xl font-bold text-primary">
-          FoodTrace 🌿
-        </Link>
-        <nav className="flex gap-4 text-gray-600 font-medium">
-          <Link to={MAIN_ROUTES.HOME} className="hover:text-primary">
-            Home
-          </Link>
-          <Link to="/about" className="hover:text-primary">
-            About
-          </Link>
-        </nav>
-        <Dropdown
-          label={formatAddress(client?.account.address ?? "")}
-          items={[
-            { label: "View profile", onClick: () => alert("View Profile") },
-            { label: "Settings", onClick: () => alert("Settings clicked") },
-            { label: "Logout", onClick: () => handleLogout() },
-          ]}
-        />
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 text-sm">
+          <div className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
+          <span className="text-muted-foreground">Base Sepolia</span>
+          <CheckCircle2 className="w-4 h-4 text-secondary" />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4">
+        {isConnected ? (
+          <div>
+            <Dropdown
+              label={formatAddress(address ?? "")}
+              items={[
+                { label: "View profile", onClick: () => alert("View Profile") },
+                { label: "Settings", onClick: () => alert("Settings clicked") },
+                { label: "Logout", onClick: () => handleLogout() },
+              ]}
+            />
+          </div>
+        ) : (
+          <Button
+            onClick={handleConnect}
+            className="relative overflow-hidden group"
+            variant="outline"
+          >
+            <div className="absolute inset-0 bg-linear-to-r from-primary/20 to-secondary/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <Wallet className="w-4 h-4 mr-2 relative z-10" />
+            <span className="relative z-10">Connect Wallet</span>
+          </Button>
+        )}
       </div>
     </header>
   );
 };
-
-export default Header;

@@ -30,21 +30,22 @@ export const Dropdown: React.FC<DropdownProps> = ({
       ref={ref}
       className={`relative inline-block text-left ${className ?? ""}`}
     >
-      <button
+      <div
         onClick={() => setOpen((prev) => !prev)}
-        className="inline-flex items-center justify-between w-full bg-[#4EB09B] px-4 py-2 text-sm font-medium text-gray-700 shadow-sm border border-gray-200 focus:outline-none rounded-2xl"
+        className="inline-flex items-center justify-between w-full bg-glass-gradient border border-primary/20 px-4 py-2 cursor-pointer text-sm font-medium text-white shadow-sm focus:outline-none rounded-2xl"
       >
-        {label}
+        <div className="w-2 h-2 rounded-full bg-secondary" />
+        <span className="ml-2 text-sm font-medium">{label}</span>
         <ChevronDown
           className={`ml-2 h-4 w-4 transition-transform duration-200 ${
             open ? "rotate-180" : "rotate-0"
           }`}
         />
-      </button>
+      </div>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-48 origin-top-right bg-white shadow-lg ring-1 ring-black ring-opacity-5 animate-in fade-in slide-in-from-top-2 rounded-2xl">
-          <div className="py-1">
+        <div className="absolute right-0 mt-2 w-48 origin-top-right bg-glass-gradient shadow-lg ring-1 ring-black ring-opacity-5 animate-in fade-in slide-in-from-top-2 rounded-2xl">
+          <div className="py-3 px-2">
             {items.map((item, index) => (
               <button
                 key={index}
@@ -52,7 +53,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   item.onClick();
                   setOpen(false);
                 }}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                className="block w-full rounded-xl text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-800 transition-colors"
               >
                 {item.label}
               </button>

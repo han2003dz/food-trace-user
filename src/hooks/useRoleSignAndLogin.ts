@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import useUserStore from "@/stores/useUserStore";
 import type { IUser } from "@/types/auth";
 import {
@@ -62,12 +61,10 @@ export const useRoleSignAndLogin = () => {
       }
 
       const userProfile = await getUserProfile();
-      console.log("userProfile", userProfile);
       setUserDetail(userProfile as IUser);
       setShouldShowSignPopup(false);
-    } catch (err: any) {
-      console.error("Sign & login failed:", err);
-      // TODO: show toast error
+    } catch {
+      handleLogout();
     } finally {
       setIsSigning(false);
       isLoggingRef.current = false;
@@ -79,6 +76,7 @@ export const useRoleSignAndLogin = () => {
     setAuth(null);
     setUserDetail(null);
     setShouldShowSignPopup(false);
+    localStorage.clear();
   };
 
   return {

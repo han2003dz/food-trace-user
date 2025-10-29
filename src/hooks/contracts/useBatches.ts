@@ -1,49 +1,29 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FOOD_TRACE_CONTRACT_ADDRESS } from "@/config/accountKit";
 import { FOOD_TRACE_ABI } from "@/config/contracts";
-import { QueryKey } from "@/types/queryKey";
 import { useSmartAccountClient } from "@account-kit/react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
-export interface UseBatchesReturn {
-  batches: any;
-  isLoading: boolean;
-  error?: string;
-  refetch: () => void;
-}
-
-export const useGetTotalBatches = (): UseBatchesReturn => {
+export const useGetTotalBatches = () => {
   const { client } = useSmartAccountClient({});
+  const [totalBatches, setTotalBatches] = useState<number | null>(null);
 
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: [QueryKey.TOTAL_BATCHES, client?.account?.address],
-    queryFn: async () => {
-      if (!client) {
-        throw new Error("Wallet not connected");
+  useEffect(() => {
+    const fetchTotalBatches = async () => {
+      if (!client) return;
+      try {
+        const result = await client.readContract({
+          address: FOOD_TRACE_CONTRACT_ADDRESS,
+          abi: FOOD_TRACE_ABI,
+          functionName: "totalBatches",
+        });
+        setTotalBatches(Number(result));
+      } catch (err) {
+        console.error("Error fetching totalBatches:", err);
       }
+    };
 
-      const totalBatches = await client.readContract({
-        address: FOOD_TRACE_CONTRACT_ADDRESS,
-        abi: FOOD_TRACE_ABI,
-        functionName: "totalBatches",
-        args: [],
-      });
+    fetchTotalBatches();
+  }, [client]);
 
-      console.log("totalBatches", totalBatches);
-
-      return {
-        totalBatches: Number(totalBatches),
-      };
-    },
-    enabled: !!client?.account?.address,
-  });
-
-  console.log("data", data);
-
-  return {
-    batches: data ?? null,
-    isLoading,
-    error: error?.message,
-    refetch,
-  };
+  return { totalBatches };
 };

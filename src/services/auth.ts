@@ -25,7 +25,6 @@ interface LoginResponse {
 
 export const getNonce = async (address: Address) => {
   const res = await api().get(`/auth/nonce`, { params: { address } });
-  console.log("res", res);
   return res.data as NonceResponse;
 };
 

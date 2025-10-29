@@ -9,7 +9,6 @@ const headers = { "Content-Type": contentType };
 export function getAccessToken() {
   try {
     const tokens = getToken();
-    console.log("tokens", tokens);
     if (!tokens) return null;
 
     return tokens?.accessToken;
@@ -22,7 +21,6 @@ const getToken = () => useUserStore.getState()?.auth?.tokens;
 
 export const api = () => {
   const accessToken = getAccessToken();
-  console.log("accessToken", accessToken);
   const client = accessToken
     ? axios.create({
         baseURL: API_URL,

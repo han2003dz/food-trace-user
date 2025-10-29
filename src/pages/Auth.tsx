@@ -11,7 +11,6 @@ import { cn } from "../utils/libs";
 import { useWalletConnect } from "@/hooks/useWalletConnect";
 import { RoleSelectModal } from "@/components/common/RoleSelectModal";
 import { useRoleSignAndLogin } from "@/hooks/useRoleSignAndLogin";
-import { useGetTotalBatches } from "@/hooks/contracts/useBatches";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -21,9 +20,6 @@ export default function LoginPage() {
 
   const { selectRoleAndLogin, shouldShowSignPopup, setShouldShowSignPopup } =
     useRoleSignAndLogin();
-
-  const { batches } = useGetTotalBatches();
-  console.log("batches", batches);
 
   useEffect(() => {
     if (isConnected && !user) {
@@ -55,12 +51,12 @@ export default function LoginPage() {
       {!isConnected && (
         <Card
           className={cn(
-            "relative w-full max-w-md shadow-xl border border-gray-200/50 mx-auto mt-[10%] px-6",
+            "relative w-full max-w-md shadow-xl border border-gray-200/50 mx-auto mt-[10%] px-6 py-4",
             "bg-white/70 dark:bg-gray-900/70 backdrop-blur-md",
             "hover:shadow-2xl transition-all duration-300"
           )}
         >
-          <CardHeader className="text-center space-y-4 pb-8">
+          <CardHeader className="text-center space-y-2 pb-4">
             <div className="flex items-center justify-center gap-2">
               <img src="/logo.svg" alt="food trace logo" className="w-8 h-8" />
               <p className="text-2xl font-bold text-[#16B364]">Food Trace</p>

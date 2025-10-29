@@ -1,140 +1,124 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
+import { Link, useLocation } from "react-router-dom";
+import { LayoutDashboard, Package, Users, Settings } from "lucide-react";
+import { cn } from "@/utils/libs";
+import {
+  Sidebar as SidebarPrimitive,
+  SidebarTrigger,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  useSidebar,
+} from "../ui/Sidebar";
+import { useEffect } from "react";
 
-import { useState, useMemo } from "react";
-import clsx from "clsx";
-import { LINK_CONFIG, MAIN_ROUTES } from "../../constants/routes";
-import { Link } from "react-router-dom";
-import { useLocation } from "react-router-dom";
-type SidebarProps = {
-  collapsed: boolean;
-  setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
-  userDetail: any;
-};
+const navItems = [
+  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: Package, label: "Batches", path: "/batches" },
+  { icon: Users, label: "Roles", path: "/roles" },
+  { icon: Settings, label: "Settings", path: "/settings" },
+];
 
-const Sidebar = ({ collapsed, setCollapsed, userDetail }: SidebarProps) => {
-  const [isHovered, setIsHovered] = useState(false);
+interface SidebarProps {
+  setSidebarClosed: any;
+}
+
+export const Sidebar = ({ setSidebarClosed }: SidebarProps) => {
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
+  useEffect(() => {
+    setSidebarClosed(isCollapsed);
+  }, [setSidebarClosed, isCollapsed]);
 
   const location = useLocation();
-  const pathname = location.pathname;
-
-  const normalizedPath = useMemo(() => {
-    if (!pathname) return "/";
-    return pathname.endsWith("/") && pathname !== "/"
-      ? pathname.slice(0, -1)
-      : pathname;
-  }, [pathname]);
-
-  const isGuest = !userDetail?.information;
-
-  const filteredLinks = useMemo(() => {
-    if (isGuest) {
-      return LINK_CONFIG.filter(
-        (l) =>
-          l.href === "/" || l.href === MAIN_ROUTES.HOME || l.id === "explore"
-      );
-    }
-    return LINK_CONFIG.filter((link) => {
-      if (link.id === "my-account" && !userDetail?.information) return false;
-      return true;
-    });
-  }, [isGuest, userDetail]);
-
-  const isActive = (href: string) => {
-    const hrefNorm =
-      href !== "/" && href.endsWith("/") ? href.slice(0, -1) : href;
-    if (hrefNorm === "/") return normalizedPath === "/";
-    return (
-      normalizedPath === hrefNorm || normalizedPath.startsWith(hrefNorm + "/")
-    );
-  };
 
   return (
-    <aside
-      className={clsx(
-        "transition-all hidden md:block duration-300 overflow-hidden min-h-screen p-4 fixed top-0 left-0 z-50 border-r border-[#ddd]",
-        collapsed ? "w-[72px]" : "w-[250px]"
+    <SidebarPrimitive
+      className={cn(
+        "border-r border-border/50 backdrop-blur-xl bg-sidebar/50",
+        isCollapsed ? "w-[72px]" : "w-[250px]"
       )}
     >
-      {collapsed ? (
-        <div
-          className="flex w-8 min-w-8 h-8 min-h-8 mx-auto items-center justify-center"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          <img
-            src={!isHovered ? "/images/logo.svg" : "/icons/collapsed.svg"}
-            alt="Food Trace"
-            width={!isHovered ? 32 : 20}
-            height={!isHovered ? 32 : 20}
-            className="cursor-pointer object-cover"
-            onClick={() => {
-              setCollapsed(!collapsed);
-              setIsHovered(false);
-            }}
-          />
-        </div>
-      ) : (
-        <div className="flex items-center justify-between">
-          <Link to={MAIN_ROUTES.HOME}>
-            <div className="text-green-500 text-2xl font-bold">Food Trace</div>
-          </Link>
-          <button
-            type="button"
-            aria-label="Toggle Sidebar"
-            onClick={() => setCollapsed(!collapsed)}
-          >
-            <img src={"/icons/close.svg"} alt="close" />
-          </button>
-        </div>
-      )}
-
-      <nav className="flex flex-col gap-2 mt-8">
-        {filteredLinks.map((link) => {
-          const active = isActive(link.href);
-          return (
-            <Link
-              key={link.id}
-              to={link.href}
-              className={clsx(
-                "h-10 rounded-full flex items-center gap-2 p-2 text-base font-medium focus:outline-none",
-                active
-                  ? ""
-                  : "text-[#9AA4B2] hover:text-white hover:bg-white/5",
-                collapsed && "justify-center"
+      <div className="p-6 flex items-center justify-between">
+        <div>
+          {!isCollapsed && (
+            <h1
+              className={cn(
+                "text-2xl font-bold bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent transition-all",
+                isCollapsed && "text-lg"
               )}
-              aria-current={active ? "page" : undefined}
             >
-              <img
-                src={active ? link.iconActive : link.icon}
-                alt={link.title}
-              />
-              {!collapsed && <span>{link.title}</span>}
-            </Link>
-          );
-        })}
-      </nav>
+              FoodTrace
+            </h1>
+          )}
 
-      {!isGuest && (
-        <>
-          <div
-            className={clsx(
-              "flex items-center mt-6",
-              collapsed ? "justify-center" : "justify-between"
-            )}
-          >
-            {!collapsed ? (
-              <div className="text-sm whitespace-nowrap text-[#9AA4B2] font-semibold leading-[18px]">
-                MY SPACE
-              </div>
-            ) : (
-              <div className="border border-[#E3E8EF] w-full" />
-            )}
-          </div>
-        </>
-      )}
-    </aside>
+          {!isCollapsed && (
+            <p className="text-xs text-muted-foreground mt-1">
+              Blockchain Traceability
+            </p>
+          )}
+        </div>
+        <SidebarTrigger className="ml-auto" />
+      </div>
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                const Icon = item.icon;
+                
+                return (
+                  <SidebarMenuItem key={item.path}>
+                    <SidebarMenuButton asChild isActive={isActive}>
+                      <Link
+                        to={item.path}
+                        className={cn(
+                          "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+                          "hover:bg-accent/10 group relative overflow-hidden",
+                          isActive &&
+                            "bg-accent/20 shadow-[0_0_15px_hsl(var(--primary)/0.3)]"
+                        )}
+                      >
+                        {isActive && (
+                          <div
+                            className="absolute inset-0 bg-linear-to-r from-primary/10 to-secondary/10 animate-shimmer"
+                            style={{ backgroundSize: "200% 100%" }}
+                          />
+                        )}
+                        <Icon
+                          className={cn(
+                            "w-5 h-5 transition-colors relative z-10",
+                            isActive
+                              ? "text-primary"
+                              : "text-muted-foreground group-hover:text-foreground"
+                          )}
+                        />
+                        {!isCollapsed && (
+                          <span
+                            className={cn(
+                              "text-sm font-medium transition-colors relative z-10",
+                              isActive
+                                ? "text-foreground"
+                                : "text-muted-foreground group-hover:text-foreground"
+                            )}
+                          >
+                            {item.label}
+                          </span>
+                        )}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </SidebarPrimitive>
   );
 };
-
-export default Sidebar;

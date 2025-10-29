@@ -4,6 +4,7 @@ import MainLayout from "./components/layouts/MainLayout";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Connect from "./pages/Auth";
+import BatchesPage from "./pages/Batches";
 
 function App() {
   return (
@@ -11,11 +12,11 @@ function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/batches" element={<BatchesPage />} />
         </Route>
 
         <Route path="/login" element={<Connect />}></Route>
 
-        {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

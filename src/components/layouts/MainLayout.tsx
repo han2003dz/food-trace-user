@@ -1,43 +1,37 @@
 import { Outlet } from "react-router-dom";
-import Header from "./Header";
 import Footer from "./Footer";
-import { useState } from "react";
-import clsx from "clsx";
-import Sidebar from "./Sidebar";
 import { ProtectedRoute } from "../../providers/ProtectedRoute";
-import { useGetTotalBatches } from "@/hooks/contracts/useBatches";
+import { Sidebar } from "./Sidebar";
+import { SidebarProvider, SidebarInset } from "../ui/Sidebar";
+import { Header } from "./Header";
+import { useState } from "react";
+import { cn } from "@/utils/libs";
 
 export default function MainLayout() {
-  const [collapsed, setCollapsed] = useState(false);
-  const { batches } = useGetTotalBatches();
-  console.log("batches", batches);
-  console.log("OK");
+  const [sidebarClosed, setSidebarClosed] = useState<boolean>(false);
   return (
     <ProtectedRoute>
-      <main className="min-h-screen flex flex-col bg-gray-50">
-        <Sidebar
-          collapsed={collapsed}
-          setCollapsed={setCollapsed}
-          userDetail={null}
-        />
+      <SidebarProvider>
+        <main className="flex min-h-screen w-full bg-linear-to-br from-background via-[#14213D] to-background">
+          <Sidebar setSidebarClosed={setSidebarClosed} />
 
-        <div className="relative flex-1 z-10">
-          <Header collapsed={collapsed} />
-          <div
-            id="content"
-            className={clsx(
-              "duration-300 pt-[72px]",
-              collapsed ? "pl-[72px]" : "pl-[250px]",
-              "max-md:pl-0"
-            )}
-          >
-            <div className="min-h-screen bg-gray-50 p-6">
+          <SidebarInset>
+            <Header sidebarClosed={sidebarClosed} />
+
+            <div
+              id="content"
+              className={cn(
+                "flex-1 pt-[72px] px-6 transition-all",
+                sidebarClosed ? "ml-[72px]" : "ml-[250px]"
+              )}
+            >
               <Outlet />
             </div>
+
             <Footer />
-          </div>
-        </div>
-      </main>
+          </SidebarInset>
+        </main>
+      </SidebarProvider>
     </ProtectedRoute>
   );
 }
