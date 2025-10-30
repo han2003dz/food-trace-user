@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, Package, Users, Settings } from "lucide-react";
 import { cn } from "@/utils/libs";
@@ -13,7 +12,8 @@ import {
   SidebarMenuButton,
   useSidebar,
 } from "../ui/Sidebar";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { useAuthStatus } from "@/hooks/useAuth";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
@@ -22,63 +22,70 @@ const navItems = [
   { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
+const minimalNav = [{ icon: LayoutDashboard, label: "Dashboard", path: "/" }];
+
 interface SidebarProps {
-  setSidebarClosed: any;
+  setSidebarClosed: (closed: boolean) => void;
 }
 
 export const Sidebar = ({ setSidebarClosed }: SidebarProps) => {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const location = useLocation();
+  const { isAuthenticated } = useAuthStatus();
+
   useEffect(() => {
     setSidebarClosed(isCollapsed);
-  }, [setSidebarClosed, isCollapsed]);
+  }, [isCollapsed, setSidebarClosed]);
 
-  const location = useLocation();
+  const displayedNav = useMemo(() => {
+    return isAuthenticated ? navItems : minimalNav;
+  }, [isAuthenticated]);
 
   return (
     <SidebarPrimitive
       className={cn(
-        "border-r border-border/50 backdrop-blur-xl bg-sidebar/50",
+        "border-r border-border/50 backdrop-blur-xl bg-sidebar/50 transition-all duration-300",
         isCollapsed ? "w-[72px]" : "w-[250px]"
       )}
     >
+      {/* Header Sidebar */}
       <div className="p-6 flex items-center justify-between">
         <div>
           {!isCollapsed && (
-            <h1
-              className={cn(
-                "text-2xl font-bold bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent transition-all",
-                isCollapsed && "text-lg"
-              )}
-            >
-              FoodTrace
-            </h1>
-          )}
-
-          {!isCollapsed && (
-            <p className="text-xs text-muted-foreground mt-1">
-              Blockchain Traceability
-            </p>
+            <>
+              <h1
+                className={cn(
+                  "text-2xl font-bold bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent transition-all"
+                )}
+              >
+                FoodTrace
+              </h1>
+              <p className="text-xs text-muted-foreground mt-1">
+                Blockchain Traceability
+              </p>
+            </>
           )}
         </div>
         <SidebarTrigger className="ml-auto" />
       </div>
 
+      {/* Menu Content */}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => {
+              {displayedNav.map((item) => {
                 const isActive = location.pathname === item.path;
                 const Icon = item.icon;
-                
+
                 return (
                   <SidebarMenuItem key={item.path}>
                     <SidebarMenuButton asChild isActive={isActive}>
                       <Link
                         to={item.path}
                         className={cn(
-                          "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+                          "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer",
                           "hover:bg-accent/10 group relative overflow-hidden",
                           isActive &&
                             "bg-accent/20 shadow-[0_0_15px_hsl(var(--primary)/0.3)]"

@@ -8,7 +8,6 @@ interface NonceResponse {
 interface LoginRequest {
   wallet_address: Address;
   signature: string;
-  role: number; // number
 }
 
 interface LoginResponse {
@@ -17,6 +16,7 @@ interface LoginResponse {
     _id: string;
     address: string;
     username: string;
+    role: number;
     referral_code: string;
     createdAt: string;
     updatedAt: string;

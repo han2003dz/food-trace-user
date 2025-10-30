@@ -5,10 +5,14 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { MetricCard } from "@/components/common/MetricCard";
 import { mockBatches, statusColors } from "@/utils/mockData";
+import { useAuthStatus } from "@/hooks/useAuth";
+import { VerifyOwnershipModal } from "@/components/common/VerifyOwnershipModal";
+import { useGetTotalBatches } from "@/hooks/contracts/useBatches";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-
+  const { isConnected, isAuthenticated } = useAuthStatus();
+  const { totalBatches } = useGetTotalBatches();
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -24,7 +28,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
           title="Total Batches"
-          value={1247}
+          value={totalBatches ?? 0}
           icon={Package}
           gradient="from-blue-500 to-cyan-500"
         />
@@ -65,7 +69,7 @@ const Dashboard = () => {
             <Button
               onClick={() => navigate("/batches")}
               variant="ghost"
-              className="text-primary hover:text-primary/80"
+              className="text-primary cursor-pointer hover:text-white"
             >
               View All →
             </Button>
@@ -152,6 +156,8 @@ const Dashboard = () => {
           <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" />
         </Button>
       </motion.div>
+
+      {isConnected && !isAuthenticated && <VerifyOwnershipModal />}
     </div>
   );
 };

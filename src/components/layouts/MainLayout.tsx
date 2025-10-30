@@ -17,7 +17,6 @@ export default function MainLayout() {
 
           <SidebarInset>
             <Header sidebarClosed={sidebarClosed} />
-
             <div
               id="content"
               className={cn(
@@ -27,7 +26,6 @@ export default function MainLayout() {
             >
               <Outlet />
             </div>
-
             <Footer />
           </SidebarInset>
         </main>
