@@ -1,5 +1,11 @@
+import BatchManagement from "@/components/pages/batches/BatchManagement";
+
 const BatchesPage = () => {
-  return <div>BatchesPages</div>;
+  return (
+    <>
+      <BatchManagement />
+    </>
+  );
 };
 
 export default BatchesPage;
