@@ -1,14 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from "@/config/api";
-
-export interface CreateBatchPayload {
-  batchCode: string;
+interface EventItem {
+  id: number;
+  name: string;
+  data?: Record<string, any>;
+}
+interface CreateBatchInput {
+  productId: string;
   fromEventId: number;
   toEventId: number;
-  events: any[];
+  events: EventItem[];
 }
 
-export const createBatch = async (data: CreateBatchPayload) => {
-  const res = await api().post("/batches", data);
+export const createBatch = async (data: CreateBatchInput) => {
+  const res = await api().post("/batches/create", data);
   return res.data;
 };

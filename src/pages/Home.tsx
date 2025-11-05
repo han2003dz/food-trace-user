@@ -15,6 +15,10 @@ const Dashboard = () => {
   const { totalBatches, committer, paused } = useGetTotalBatches();
   console.log("committer", committer);
   console.log("paused", paused);
+  console.log(
+    "isConnected && !isAuthenticated",
+    isConnected && !isAuthenticated
+  );
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

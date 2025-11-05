@@ -44,6 +44,19 @@ const BatchManagement = () => {
           <Plus className="w-4 h-4" />
           Create Batch
         </Button>
+
+        <Button onClick={() => navigate("/products/create")} className="gap-2">
+          <Plus className="w-4 h-4" />
+          Create Product
+        </Button>
+
+        <Button
+          onClick={() => navigate("/trace?batch=LOT-APPLE-VIET-NAM-2025-001")}
+          className="gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          Detail
+        </Button>
       </div>
 
       {/* Filters */}
