@@ -20,7 +20,7 @@ export default function MainLayout() {
             <div
               id="content"
               className={cn(
-                "flex-1 pt-[72px] px-6 transition-all",
+                "flex-1 pt-5 pb-8 px-6 transition-all",
                 sidebarClosed ? "ml-[72px]" : "ml-[250px]"
               )}
             >
