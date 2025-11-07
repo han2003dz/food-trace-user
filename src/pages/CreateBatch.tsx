@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
@@ -7,19 +8,15 @@ import { toast } from "sonner";
 import { CreateBatchNoti } from "@/components/pages/create-batch/CreateBatchNoti";
 import { BackButton } from "@/components/common/BackButton";
 import { ProgressBar } from "@/components/common/ProgressBar";
-import type { CreateBatchFormData } from "@/types/form";
+import type { CreateBatchFormData, HandleChangeFormData } from "@/types/form";
 import { CreateBatchForm } from "@/components/pages/create-batch/CreateBatchForm";
 
 const steps = ["Basic Info", "Origin Details", "Review & Submit"];
-
 const CreateBatch = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [manufactureDate, setManufactureDate] = useState<Date>();
-  const [expiryDate, setExpiryDate] = useState<Date>();
   const [formData, setFormData] = useState<CreateBatchFormData>({
     productName: "",
     description: "",
@@ -31,10 +28,16 @@ const CreateBatch = () => {
     expiryDate: undefined,
   });
 
-  const handleChangeFormData = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  const handleChangeFormData: HandleChangeFormData = (
+    eOrName: any,
+    value?: any
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (typeof eOrName === "string") {
+      setFormData((prev) => ({ ...prev, [eOrName]: value }));
+    } else {
+      const { name, value } = eOrName.target;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleNext = () => {
@@ -51,31 +54,29 @@ const CreateBatch = () => {
     }
   };
 
-  const handleImageClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleImageClick = () => fileInputRef.current?.click();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Image size should be less than 5MB");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedImage(reader.result as string);
-        toast.success("Image uploaded successfully!");
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size should be less than 5MB");
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      setFormData((prev) => ({ ...prev, image: base64 }));
+      toast.success("Image uploaded successfully!");
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleRemoveImage = () => {
-    setSelectedImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    setFormData((prev) => ({ ...prev, image: null }));
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleBack = () => {
@@ -86,6 +87,7 @@ const CreateBatch = () => {
 
   const handleSubmit = () => {
     setIsSubmitted(true);
+    console.log("formData", formData);
     setTimeout(() => {
       navigate("/batches");
     }, 2000);
@@ -125,12 +127,6 @@ const CreateBatch = () => {
           <CreateBatchForm
             currentStep={currentStep}
             formData={formData}
-            setFormData={setFormData}
-            manufactureDate={manufactureDate}
-            setManufactureDate={setManufactureDate}
-            expiryDate={expiryDate}
-            setExpiryDate={setExpiryDate}
-            selectedImage={selectedImage}
             handleChangeFormData={handleChangeFormData}
             handleImageChange={handleImageChange}
             handleImageClick={handleImageClick}
@@ -138,31 +134,27 @@ const CreateBatch = () => {
             fileInputRef={fileInputRef}
           />
           <div className="flex justify-between mt-8 pt-6 border-t border-border/50">
-            {" "}
             <Button
               variant="outline"
               onClick={handleBack}
               disabled={currentStep === 0}
               className="gap-2"
             >
-              {" "}
-              <ArrowLeft className="w-4 h-4" /> Back{" "}
-            </Button>{" "}
+              <ArrowLeft className="w-4 h-4" /> Back
+            </Button>
             {currentStep < steps.length - 1 ? (
               <Button onClick={handleNext} className="gap-2">
-                {" "}
-                Next <ArrowRight className="w-4 h-4" />{" "}
+                Next <ArrowRight className="w-4 h-4" />
               </Button>
             ) : (
               <Button
                 onClick={handleSubmit}
                 className="gap-2 bg-linear-to-r from-primary to-secondary"
               >
-                {" "}
-                <CheckCircle2 className="w-4 h-4" /> Submit Batch{" "}
+                <CheckCircle2 className="w-4 h-4" /> Submit Batch
               </Button>
-            )}{" "}
-          </div>{" "}
+            )}
+          </div>
         </div>
       </motion.div>
     </div>
