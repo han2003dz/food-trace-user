@@ -11,6 +11,15 @@ export interface Batch {
   image?: string;
 }
 
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  images: string[];
+  createdAt: string;
+}
+
 export interface TimelineEvent {
   id: string;
   title: string;
@@ -136,3 +145,46 @@ export const statusColors = {
   delivered: "bg-green-500/20 text-green-400 border-green-500/50",
   verified: "bg-secondary/20 text-secondary border-secondary/50",
 };
+
+export const mockProducts: Product[] = [
+  {
+    id: "1",
+    name: "Organic Tomatoes",
+    description: "Fresh organic tomatoes from local farms",
+    category: "Vegetables",
+    images: [],
+    createdAt: "2024-01-15T10:00:00Z",
+  },
+  {
+    id: "2",
+    name: "Free Range Eggs",
+    description: "Farm fresh free range eggs",
+    category: "Dairy & Eggs",
+    images: [],
+    createdAt: "2024-01-16T10:00:00Z",
+  },
+  {
+    id: "3",
+    name: "Grass Fed Beef",
+    description: "Premium grass fed beef",
+    category: "Meat",
+    images: [],
+    createdAt: "2024-01-17T10:00:00Z",
+  },
+  {
+    id: "4",
+    name: "Wild Salmon",
+    description: "Fresh wild-caught salmon",
+    category: "Seafood",
+    images: [],
+    createdAt: "2024-01-13T10:00:00Z",
+  },
+  {
+    id: "5",
+    name: "Organic Coffee Beans",
+    description: "Premium organic coffee beans",
+    category: "Beverages",
+    images: [],
+    createdAt: "2024-01-12T10:00:00Z",
+  },
+];

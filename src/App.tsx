@@ -4,11 +4,12 @@ import MainLayout from "./components/layouts/MainLayout";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import BatchesPage from "./pages/Batches";
-import { ProductCreate } from "./components/pages/batches/CreateProducts";
 import { TraceDetail } from "./pages/TraceDetailPage";
 import { QRScanner } from "./pages/QRScanner";
 import BatchDetail from "./pages/TraceDetail";
 import CreateBatch from "./pages/CreateBatch";
+import ProductManagement from "./pages/Products";
+import CreateProduct from "./pages/CreateProduct";
 // import CreateBatch from "./pages/CreateBatch";
 
 function App() {
@@ -19,7 +20,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/batches" element={<BatchesPage />}></Route>
           <Route path="/batches/create" element={<CreateBatch />}></Route>
-          <Route path="/products/create" element={<ProductCreate />}></Route>
+          <Route path="/products" element={<ProductManagement />} />
+          <Route path="/products/create" element={<CreateProduct />} />
           <Route path="/trace" element={<TraceDetail />} />
           <Route path="/scan" element={<QRScanner />} />
           <Route path="/batches/:id" element={<BatchDetail />} />

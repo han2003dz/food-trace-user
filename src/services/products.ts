@@ -1,20 +1,17 @@
 import { api } from "@/config/api";
+import type { CreateProductFormData } from "@/types/form";
 
-interface CreateProductInput {
-  name: string;
-  origin: string;
-  manufacture_date: string;
-  expiry_date: string;
-  image_url?: string;
-  description?: string;
-}
-
-export const createProducts = async (data: CreateProductInput) => {
+export const createProducts = async (data: CreateProductFormData) => {
   const res = await api().post("/products/create", data);
   return res.data;
 };
 
 export const getListProducts = async () => {
   const res = await api().get("/products");
+  return res.data;
+};
+
+export const getListProductsByOwner = async () => {
+  const res = await api().get("/products/my");
   return res.data;
 };

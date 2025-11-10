@@ -10,13 +10,16 @@ import { BackButton } from "@/components/common/BackButton";
 import { ProgressBar } from "@/components/common/ProgressBar";
 import type { CreateBatchFormData, HandleChangeFormData } from "@/types/form";
 import { CreateBatchForm } from "@/components/pages/create-batch/CreateBatchForm";
+import { cn } from "@/utils/libs";
 
 const steps = ["Basic Info", "Origin Details", "Review & Submit"];
+
 const CreateBatch = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
   const [formData, setFormData] = useState<CreateBatchFormData>({
     productName: "",
     description: "",
@@ -138,7 +141,7 @@ const CreateBatch = () => {
               variant="outline"
               onClick={handleBack}
               disabled={currentStep === 0}
-              className="gap-2"
+              className={cn("gap-2", currentStep === 0 && "cursor-not-allowed")}
             >
               <ArrowLeft className="w-4 h-4" /> Back
             </Button>

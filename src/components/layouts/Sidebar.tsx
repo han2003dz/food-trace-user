@@ -1,5 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Package, Users, Settings } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  Users,
+  Settings,
+  ShoppingBag,
+} from "lucide-react";
 import { cn } from "@/utils/libs";
 import {
   Sidebar as SidebarPrimitive,
@@ -18,6 +24,7 @@ import { useAuthStatus } from "@/hooks/useAuth";
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: Package, label: "Batches", path: "/batches" },
+  { icon: ShoppingBag, label: "Products", path: "/products" },
   { icon: Users, label: "Roles", path: "/roles" },
   { icon: Settings, label: "Settings", path: "/settings" },
 ];

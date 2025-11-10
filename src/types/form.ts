@@ -1,32 +1,36 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ChangeEvent } from "react";
+import type { Certification } from "./certification";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface CreateBatchFormData {
   productName: string;
+  description: string;
   categoryId: string;
   producerName: string;
   origin: string;
   batchCode: string;
-
-  description?: string;
-  manufactureDate?: Date;
-  expiryDate?: Date;
+  manufactureDate: Date | undefined;
+  expiryDate: Date | undefined;
   image?: string | null;
-
-  certifications?: {
-    type: string; // "VietGAP"
-    issuer: string; // "Bộ NN&PTNT"
-    id: string; // "VG-2025-001"
-  }[];
-  storageConditions?: string; // "18°C - 22°C"
-  nutritionalInfo?: Record<string, any>; // { calories: 50, protein: 2g }
+  certifications?: Certification[];
+  storageConditions?: string;
+  nutritionalInfo?: Record<string, any>;
 }
 
-export interface HandleChangeFormData {
-  (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void;
+export type HandleChangeFormData = (
+  eOrName: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string,
+  value?: any
+) => void;
 
-  <K extends keyof CreateBatchFormData>(
-    name: K,
-    value: CreateBatchFormData[K]
-  ): void;
+export interface CreateProductFormData {
+  product_name: string;
+  origin: string;
+  producer_name: string;
+  category_id: string;
+  manufacture_date: Date | undefined;
+  expiry_date: Date | undefined;
+  description?: string;
+  image?: string | null;
+  certifications?: Certification[];
+  storage_conditions?: string;
+  nutritional_info?: Record<string, any>;
 }
