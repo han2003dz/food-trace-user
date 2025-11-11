@@ -132,18 +132,17 @@ export const useWalletConnect = () => {
 };
 
 export function useAuthStatus() {
-  const { client, address } = useSmartAccountClient({});
   const hasSignedMessage = useUserStore((state) => state.hasSignedMessage());
+  const { isConnected } = useWalletConnect();
 
   const status = useMemo(() => {
-    if (!client || !address) return "disconnected";
-    if (client && address && !hasSignedMessage) return "connected";
-    if (hasSignedMessage) return "authenticated";
-    return "connected";
-  }, [client, address, hasSignedMessage]);
+    if (!isConnected) return "disconnected";
+    if (isConnected && !hasSignedMessage) return "connected";
+    if (isConnected && hasSignedMessage) return "authenticated";
+    return "disconnected";
+  }, [isConnected, hasSignedMessage]);
 
   const isDisconnected = status === "disconnected";
-  const isConnected = status === "connected";
   const isAuthenticated = status === "authenticated";
 
   return {
@@ -151,6 +150,5 @@ export function useAuthStatus() {
     isDisconnected,
     isConnected,
     isAuthenticated,
-    address,
   };
 }

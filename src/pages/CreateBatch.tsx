@@ -11,6 +11,7 @@ import { ProgressBar } from "@/components/common/ProgressBar";
 import type { CreateBatchFormData, HandleChangeFormData } from "@/types/form";
 import { CreateBatchForm } from "@/components/pages/create-batch/CreateBatchForm";
 import { cn } from "@/utils/libs";
+import { useGetListProductsByOwner } from "@/hooks/useProducts";
 
 const steps = ["Basic Info", "Origin Details", "Review & Submit"];
 
@@ -20,15 +21,14 @@ const CreateBatch = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const { data: products, isLoading, error } = useGetListProductsByOwner();
+
   const [formData, setFormData] = useState<CreateBatchFormData>({
-    productName: "",
+    product_id: "",
     description: "",
-    categoryId: "",
-    producerName: "",
-    origin: "",
-    batchCode: "",
-    manufactureDate: undefined,
-    expiryDate: undefined,
+    from_event_id: 0,
+    to_event_id: 1,
+    events: {},
   });
 
   const handleChangeFormData: HandleChangeFormData = (

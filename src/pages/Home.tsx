@@ -12,13 +12,7 @@ import { useGetTotalBatches } from "@/hooks/contracts/useBatches";
 const Dashboard = () => {
   const navigate = useNavigate();
   const { isConnected, isAuthenticated } = useAuthStatus();
-  const { totalBatches, committer, paused } = useGetTotalBatches();
-  console.log("committer", committer);
-  console.log("paused", paused);
-  console.log(
-    "isConnected && !isAuthenticated",
-    isConnected && !isAuthenticated
-  );
+  const { totalBatches } = useGetTotalBatches();
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

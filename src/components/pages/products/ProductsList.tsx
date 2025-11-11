@@ -23,7 +23,6 @@ interface ProductListProps {
 export const ProductList = ({ products, isLoading }: ProductListProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  console.log("categoryFilter", categoryFilter);
   const navigate = useNavigate();
 
   const filteredProducts =
@@ -84,9 +83,7 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
             <SelectValue placeholder="Filter by category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">
-              All Categories
-            </SelectItem>
+            <SelectItem value="all">All Categories</SelectItem>
             {CATEGORIES.map((cat) => (
               <SelectItem key={cat.id} value={String(cat.id)}>
                 {cat.name}

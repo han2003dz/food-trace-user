@@ -10,7 +10,6 @@ import BatchDetail from "./pages/TraceDetail";
 import CreateBatch from "./pages/CreateBatch";
 import ProductManagement from "./pages/Products";
 import CreateProduct from "./pages/CreateProduct";
-// import CreateBatch from "./pages/CreateBatch";
 
 function App() {
   return (

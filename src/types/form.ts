@@ -2,18 +2,11 @@ import type { Certification } from "./certification";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface CreateBatchFormData {
-  productName: string;
-  description: string;
-  categoryId: string;
-  producerName: string;
-  origin: string;
-  batchCode: string;
-  manufactureDate: Date | undefined;
-  expiryDate: Date | undefined;
-  image?: string | null;
-  certifications?: Certification[];
-  storageConditions?: string;
-  nutritionalInfo?: Record<string, any>;
+  product_id: string;
+  description?: string;
+  from_event_id: number;
+  to_event_id: number;
+  events: any;
 }
 
 export type HandleChangeFormData = (
