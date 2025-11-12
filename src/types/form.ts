@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { Certification } from "./certification";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface CreateBatchFormData {
   product_id: string;
   description?: string;
