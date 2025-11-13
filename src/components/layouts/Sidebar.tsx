@@ -23,6 +23,7 @@ import { useAuthStatus } from "@/hooks/useAuth";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: Users, label: "Organizations", path: "/organizations" },
   { icon: Package, label: "Batches", path: "/batches" },
   { icon: ShoppingBag, label: "Products", path: "/products" },
   { icon: Users, label: "Roles", path: "/roles" },

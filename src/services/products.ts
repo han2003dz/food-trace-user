@@ -2,7 +2,10 @@ import { api } from "@/config/api";
 import type { CreateProductFormData } from "@/types/form";
 
 export const createProducts = async (data: CreateProductFormData) => {
-  const res = await api().post("/products/create", data);
+  const res = await api().post("/products/create", {
+    ...data,
+    image_url: data.image_url ?? null,
+  });
   return res.data;
 };
 

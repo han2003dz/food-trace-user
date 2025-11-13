@@ -10,7 +10,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useUserProfile } from "./useUser";
 import useUserStore from "@/stores/useUserStore";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { IUser } from "@/types/auth";
 
 const useGetNonce = () => {
@@ -33,7 +33,11 @@ export const useAuthentication = () => {
   const { mutateAsync: loginToSystem } = useLogin();
   const { mutateAsync: getUserProfile } = useUserProfile();
 
-  const { setAuth, setUserDetail, hasSignedMessage } = useUserStore.getState();
+  const userDetail = useUserStore((s) => s.userDetail);
+  const setUserDetail = useUserStore((s) => s.setUserDetail);
+  const setAuth = useUserStore((s) => s.setAuth);
+  const hasSignedMessage = useUserStore((s) => s.hasSignedMessage);
+
   const [isSigning, setIsSigning] = useState(false);
   const [shouldShowSignPopup, setShouldShowSignPopup] = useState(
     !hasSignedMessage()
@@ -46,8 +50,17 @@ export const useAuthentication = () => {
     setShouldShowSignPopup(!hasSignedMessage());
   }, [hasSignedMessage]);
 
+  const handleLogout = useCallback(() => {
+    logout();
+    setAuth(null);
+    setUserDetail(null);
+    setShouldShowSignPopup(false);
+    localStorage.clear();
+  }, [logout, setAuth, setUserDetail]);
+
   const handleSignMessage = async () => {
     if (!address || !client || isSigning || isLoggingRef.current) return;
+
     try {
       isLoggingRef.current = true;
       setIsSigning(true);
@@ -63,11 +76,12 @@ export const useAuthentication = () => {
       if (loginResponse?.access_token) {
         setAuth({
           tokens: { accessToken: loginResponse.access_token },
-          address,
+          wallet_address: address,
         });
       }
 
       const userProfile = await getUserProfile();
+      console.log("userProfile", userProfile);
       setUserDetail(userProfile as IUser);
       setShouldShowSignPopup(false);
     } catch {
@@ -78,14 +92,26 @@ export const useAuthentication = () => {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    setAuth(null);
-    setUserDetail(null);
-    setShouldShowSignPopup(false);
-    localStorage.clear();
-  };
+  useEffect(() => {
+    const init = async () => {
+      if (userDetail && userDetail.wallet_address === address) {
+        try {
+          const profile = await getUserProfile();
+          setUserDetail(profile as IUser);
+          setShouldShowSignPopup(false);
+        } catch {
+          handleLogout();
+        }
+        return;
+      }
 
+      if (!userDetail && address) {
+        setShouldShowSignPopup(true);
+      }
+    };
+
+    init();
+  }, [userDetail, address, getUserProfile, setUserDetail, handleLogout]);
   return {
     handleSignMessage,
     handleLogout,

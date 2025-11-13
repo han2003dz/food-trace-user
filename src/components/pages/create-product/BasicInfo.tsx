@@ -50,12 +50,12 @@ export const BasicInfo = ({
     >
       {/* Product Name */}
       <div className="space-y-2">
-        <Label htmlFor="product_name">Product Name *</Label>
+        <Label htmlFor="name">Product Name *</Label>
         <Input
-          id="product_name"
-          name="product_name"
+          id="name"
+          name="name"
           placeholder="e.g., Organic Tomatoes"
-          value={formData.product_name}
+          value={formData.name}
           onChange={handleChangeFormData}
           className="bg-card/50"
         />
@@ -65,15 +65,14 @@ export const BasicInfo = ({
       <div className="space-y-2">
         <Label htmlFor="category">Category *</Label>
         <Select
-          value={formData.category_id || ""}
-          onValueChange={(value) => handleChangeFormData("category_id", value)}
+          value={formData.category || ""}
+          onValueChange={(value) => handleChangeFormData("category", value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select category">
-              {formData.category_id
-                ? CATEGORIES.find(
-                    (cat) => String(cat.id) === formData.category_id
-                  )?.name
+              {formData.category
+                ? CATEGORIES.find((cat) => String(cat.id) === formData.category)
+                    ?.name
                 : "Select category"}
             </SelectValue>
           </SelectTrigger>
@@ -163,10 +162,10 @@ export const BasicInfo = ({
           className="hidden"
         />
 
-        {formData.image ? (
+        {formData.image_url ? (
           <div className="relative border-2 border-gray bg-card/50 rounded-lg overflow-hidden">
             <img
-              src={formData.image}
+              src={formData.image_url}
               alt="Product preview"
               className="w-full h-48 object-cover"
             />

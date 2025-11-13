@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { Certification } from "./certification";
-
 export interface CreateBatchFormData {
   product_id: string;
-  description?: string;
-  from_event_id: number;
-  to_event_id: number;
-  events: any;
+  creator_org_id?: string;
+  initial_data_raw: string;
+  initial_data_hash: string; // auto
+  metadata_uri?: string;
 }
 
 export type HandleChangeFormData = (
@@ -16,15 +14,19 @@ export type HandleChangeFormData = (
 ) => void;
 
 export interface CreateProductFormData {
-  product_name: string;
-  origin: string;
-  producer_name: string;
-  category_id: string;
+  name: string;
+  description?: string;
+  image_url?: string | null;
+
+  origin?: string;
+  producer_name?: string;
   manufacture_date: Date | undefined;
   expiry_date: Date | undefined;
-  description?: string;
-  image?: string | null;
-  certifications?: Certification[];
+
+  category?: string;
   storage_conditions?: string;
   nutritional_info?: Record<string, any>;
+
+  metadata_uri?: string;
+  organization_id?: string;
 }

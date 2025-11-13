@@ -3,16 +3,16 @@ export interface IAccessTokens {
 }
 
 export interface IUserAuth {
-  address: string;
+  wallet_address: string;
   tokens: IAccessTokens;
 }
 
 export interface IUser {
   _id: string;
-  address: string;
+  wallet_address: string;
   username: string;
   email: string;
-  role: number;
+  role: string;
   createdAt: string;
   updatedAt: string;
 }

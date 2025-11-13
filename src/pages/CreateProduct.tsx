@@ -22,15 +22,14 @@ const CreateProduct = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { mutateAsync } = useCreateProduct();
   const [formData, setFormData] = useState<CreateProductFormData>({
-    product_name: "",
+    name: "",
     description: "",
-    category_id: "",
+    category: "",
     producer_name: "",
     origin: "",
-    image: null,
+    image_url: null,
     manufacture_date: undefined,
     expiry_date: undefined,
-    certifications: [],
     storage_conditions: "",
     nutritional_info: {},
   });
@@ -38,11 +37,11 @@ const CreateProduct = () => {
   const validateStep = (step: number): boolean => {
     switch (step) {
       case 0: // Basic Info
-        if (!formData.product_name.trim()) {
+        if (!formData.name.trim()) {
           toast.error("Product name is required");
           return false;
         }
-        if (!formData.category_id) {
+        if (!formData.category) {
           toast.error("Category is required");
           return false;
         }
@@ -62,11 +61,11 @@ const CreateProduct = () => {
         return true;
 
       case 1: // Origin Details
-        if (!formData.origin.trim()) {
+        if (!formData?.origin?.trim()) {
           toast.error("Origin is required");
           return false;
         }
-        if (!formData.producer_name.trim()) {
+        if (!formData?.producer_name?.trim()) {
           toast.error("Producer name is required");
           return false;
         }
@@ -79,20 +78,16 @@ const CreateProduct = () => {
 
   const transformFormData = (): CreateProductFormData => {
     return {
-      product_name: formData.product_name.trim(),
-      origin: formData.origin.trim(),
-      category_id: formData.category_id,
-      producer_name: formData.producer_name.trim(),
+      name: formData.name.trim(),
+      origin: formData?.origin?.trim() || "",
+      category: formData.category,
+      producer_name: formData?.producer_name?.trim(),
       manufacture_date: formData.manufacture_date,
       expiry_date: formData.expiry_date,
       description: formData.description
         ? formData.description.trim()
         : undefined,
-      image: formData.image || undefined,
-      certifications:
-        formData.certifications && formData.certifications.length > 0
-          ? formData.certifications
-          : undefined,
+      image_url: formData.image_url || undefined,
       storage_conditions: formData.storage_conditions?.trim() || undefined,
       nutritional_info:
         formData.nutritional_info &&

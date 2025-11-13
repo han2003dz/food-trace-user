@@ -22,17 +22,16 @@ export const ReviewAndSubmitForm = ({ formData }: ReviewAndSubmitFormProps) => {
           <div>
             <p className="text-muted-foreground">Product Name</p>
             <p className="font-medium">
-              {formData.product_name ? formData.product_name : "N/A"}
+              {formData.name ? formData.name : "N/A"}
             </p>
           </div>
           <div>
             <p className="text-muted-foreground">Category</p>
             <p className="font-medium">
-              {CATEGORIES.find((cat) => String(cat.id) === formData.category_id)
+              {CATEGORIES.find((cat) => String(cat.id) === formData.category)
                 ?.name
-                ? CATEGORIES.find(
-                    (cat) => String(cat.id) === formData.category_id
-                  )?.name
+                ? CATEGORIES.find((cat) => String(cat.id) === formData.category)
+                    ?.name
                 : "N/A"}
             </p>
           </div>
