@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { CreateBatchFormData } from "@/types/form";
 import { motion } from "framer-motion";
-import { Label } from "@/components/ui/Label";
 
 interface ReviewAndSubmitFormProps {
   formData: CreateBatchFormData;
@@ -42,16 +41,6 @@ export const ReviewAndSubmitForm = ({
           </div>
         </div>
 
-        {/* Initial data */}
-        <div className="space-y-2 pt-4 border-t border-border/50">
-          <Label className="text-sm text-muted-foreground">
-            Initial Batch Data
-          </Label>
-          <p className="text-sm whitespace-pre-wrap bg-card/40 rounded-md p-3">
-            {formData.initial_data_raw || "No initial data provided."}
-          </p>
-        </div>
-
         {/* Metadata URI */}
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">Metadata URI</p>
@@ -59,16 +48,6 @@ export const ReviewAndSubmitForm = ({
             {formData.metadata_uri && formData.metadata_uri.trim().length > 0
               ? formData.metadata_uri
               : "(none)"}
-          </p>
-        </div>
-
-        {/* Hash */}
-        <div className="space-y-2 pt-4 border-t border-border/50">
-          <p className="text-sm text-muted-foreground">
-            Generated Initial Data Hash
-          </p>
-          <p className="font-mono text-xs break-all">
-            {formData.initial_data_hash || "N/A"}
           </p>
         </div>
 

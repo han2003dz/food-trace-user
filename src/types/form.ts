@@ -3,8 +3,6 @@
 export interface CreateBatchFormData {
   product_id: string;
   creator_org_id?: string;
-  initial_data_raw: string;
-  initial_data_hash: string; // auto
   metadata_uri?: string;
 }
 

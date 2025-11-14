@@ -28,8 +28,6 @@ const CreateBatch = () => {
   const [formData, setFormData] = useState<CreateBatchFormData>({
     product_id: "",
     creator_org_id: "",
-    initial_data_raw: "",
-    initial_data_hash: "",
     metadata_uri: "",
   });
 
@@ -59,14 +57,6 @@ const CreateBatch = () => {
         return;
       }
     }
-
-    if (currentStep === 1) {
-      if (!formData.initial_data_hash) {
-        toast.error("Initial batch data is required");
-        return;
-      }
-    }
-
     setCurrentStep((prev) => prev + 1);
   };
 

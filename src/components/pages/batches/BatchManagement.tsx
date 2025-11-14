@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 
-import { Search, Filter, Plus } from "lucide-react";
+import { Search, Filter, Plus, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -12,24 +12,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/Select";
-import { mockBatches, statusColors } from "@/utils/mockData";
+import { useGetBatchByUser } from "@/hooks/useBatch";
+import { statusColors } from "@/constants/batch";
+import { getCategoryName } from "@/utils/categories";
 
 const BatchManagement = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const { data: batches, isLoading, error } = useGetBatchByUser();
 
-  const filteredBatches = mockBatches.filter((batch) => {
-    const matchesSearch =
-      batch.batchCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      batch.product.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      batch.owner.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "all" || batch.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
+  if (isLoading) return <Loader2 />;
+  if (error) return <p>Failed to load batches</p>;
 
   return (
     <div className="space-y-6">
@@ -43,19 +37,6 @@ const BatchManagement = () => {
         <Button onClick={() => navigate("/batches/create")} className="gap-2">
           <Plus className="w-4 h-4" />
           Create Batch
-        </Button>
-
-        <Button onClick={() => navigate("/products/create")} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Create Product
-        </Button>
-
-        <Button
-          onClick={() => navigate("/trace?batch=LOT-APPLE-VIET-NAM-2025-001")}
-          className="gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Detail
         </Button>
       </div>
 
@@ -125,7 +106,7 @@ const BatchManagement = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredBatches.map((batch, index) => (
+                {batches?.map((batch, index) => (
                   <motion.tr
                     key={batch.id}
                     initial={{ opacity: 0, x: -20 }}
@@ -136,20 +117,20 @@ const BatchManagement = () => {
                   >
                     <td className="py-4 px-4">
                       <span className="font-mono text-sm text-primary group-hover/row:text-secondary transition-colors">
-                        {batch.batchCode}
+                        {batch?.metadata?.initial_data_raw.batch_code}
                       </span>
                     </td>
                     <td className="py-4 px-4">
-                      <span className="font-medium">{batch.product}</span>
+                      <span className="font-medium">{batch.product.name}</span>
                     </td>
                     <td className="py-4 px-4">
                       <span className="text-sm text-muted-foreground">
-                        {batch.owner}
+                        {batch.current_owner.name}
                       </span>
                     </td>
                     <td className="py-4 px-4">
                       <span className="text-sm text-muted-foreground">
-                        {batch.category}
+                        {getCategoryName(batch.product.category)}
                       </span>
                     </td>
                     <td className="py-4 px-4">
@@ -163,7 +144,7 @@ const BatchManagement = () => {
                     </td>
                     <td className="py-4 px-4">
                       <span className="text-sm text-muted-foreground">
-                        {new Date(batch.timestamp).toLocaleDateString()}
+                        {new Date(batch.created_at).toLocaleDateString()}
                       </span>
                     </td>
                   </motion.tr>

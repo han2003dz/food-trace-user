@@ -27,6 +27,7 @@ export interface ProductResponse {
   metadata: Record<string, any> | null;
   created_at: string; // ISO date string
   updated_at: string; // ISO date string
+  category: string;
 }
 
 export interface ProductListItem {

@@ -1,7 +1,7 @@
-import { CATEGORIES } from "@/mocks/categories";
 import type { CreateProductFormData } from "@/types/form";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
+import { getCategoryName } from "@/utils/categories";
 interface ReviewAndSubmitFormProps {
   formData: CreateProductFormData;
 }
@@ -27,13 +27,7 @@ export const ReviewAndSubmitForm = ({ formData }: ReviewAndSubmitFormProps) => {
           </div>
           <div>
             <p className="text-muted-foreground">Category</p>
-            <p className="font-medium">
-              {CATEGORIES.find((cat) => String(cat.id) === formData.category)
-                ?.name
-                ? CATEGORIES.find((cat) => String(cat.id) === formData.category)
-                    ?.name
-                : "N/A"}
-            </p>
+            <p className="font-medium">{getCategoryName(formData.category)}</p>
           </div>
           <div>
             <p className="text-muted-foreground">Producer</p>

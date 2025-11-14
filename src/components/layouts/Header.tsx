@@ -10,9 +10,10 @@ import {
 
 interface HeaderProps {
   sidebarClosed: boolean;
+  isMobile: boolean;
 }
 
-export const Header = ({ sidebarClosed }: HeaderProps) => {
+export const Header = ({ sidebarClosed, isMobile }: HeaderProps) => {
   const { handleLogout } = useAuthentication();
   const { connectWallet, isConnecting, logout, address } = useWalletConnect();
   const { isConnected, isAuthenticated } = useAuthStatus();
@@ -20,7 +21,7 @@ export const Header = ({ sidebarClosed }: HeaderProps) => {
     <header
       className={cn(
         "h-16 border-b border-border/50 backdrop-blur-xl bg-card/30 flex items-center justify-between px-6 transition-all duration-300",
-        sidebarClosed ? "ml-[72px]" : "ml-[250px]"
+        !isMobile && (sidebarClosed ? "ml-[72px]" : "ml-[250px]")
       )}
     >
       {/* Left side: Network indicator */}
