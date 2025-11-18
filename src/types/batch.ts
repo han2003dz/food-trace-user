@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Organization } from "./organization";
+import type { PaginationMeta } from "./paginate";
 import type { ProductResponse } from "./products";
 
 export interface Batch {
@@ -106,4 +107,9 @@ export interface BatchEvent {
   timestamp?: string | null;
 
   created_at: string;
+}
+
+export interface PaginatedBatchResponse {
+  items: Batch[];
+  meta: PaginationMeta;
 }

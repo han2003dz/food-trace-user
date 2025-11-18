@@ -119,7 +119,7 @@ export default function CreateOrganization() {
           </p>
         </div>
       </div>
-      {userDetail?.role === "CUSTOMER" ? (
+      {userDetail?.role === "CONSUMER" ? (
         <>
           <div className="backdrop-blur-xl bg-card/50 border border-border/50 rounded-xl p-8 space-y-6">
             {/* Organization Name */}
