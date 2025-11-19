@@ -336,6 +336,7 @@ const BatchDetail = () => {
     );
 
   const timeline = batch?.timeline || [];
+  console.log("timeline", timeline);
 
   return (
     <div className="space-y-6">

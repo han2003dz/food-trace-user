@@ -51,6 +51,26 @@ export const uiConfig: AlchemyAccountsUIConfig = {
         { type: "passkey" },
         { type: "social", authProviderId: "google", mode: "popup" },
         { type: "social", authProviderId: "facebook", mode: "popup" },
+        { type: "social", authProviderId: "twitch", mode: "popup" },
+        // {
+        //   type: "social",
+        //   authProviderId: "auth0",
+        //   mode: "popup",
+        //   auth0Connection: "discord",
+        //   displayName: "Discord",
+        //   logoUrl: "/images/discord.svg",
+        //   scope: "openid profile",
+        // },
+        // {
+        //   type: "social",
+        //   authProviderId: "auth0",
+        //   mode: "popup",
+        //   auth0Connection: "twitter",
+        //   displayName: "Twitter",
+        //   logoUrl: "/images/twitter.svg",
+        //   logoUrlDark: "/images/twitter-dark.svg",
+        //   scope: "openid profile",
+        // },
       ],
       [{ type: "external_wallets" }],
     ],
@@ -91,6 +111,9 @@ export const accountKitConfig = createConfig(
     enablePopupOauth: true,
     policyId: SPONSORSHIP_POLICY_ID,
     policyToken,
+    sessionConfig: {
+      expirationTimeMs: 1000 * 60 * 60, // 1 hour (defaults to 15 min)
+    },
   },
   uiConfig
 );
