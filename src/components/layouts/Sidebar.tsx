@@ -5,6 +5,7 @@ import {
   Users,
   Settings,
   ShoppingBag,
+  Atom,
 } from "lucide-react";
 import { cn } from "@/utils/libs";
 import {
@@ -25,6 +26,7 @@ const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: Users, label: "Organizations", path: "/organizations" },
   { icon: Package, label: "Batches", path: "/batches" },
+  { icon: Atom, label: "Transfer", path: "/transfer" },
   { icon: ShoppingBag, label: "Products", path: "/products" },
   { icon: Users, label: "Roles", path: "/roles" },
   { icon: Settings, label: "Settings", path: "/settings" },
