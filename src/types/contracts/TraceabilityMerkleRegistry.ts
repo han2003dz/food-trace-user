@@ -23,50 +23,35 @@ import type {
   TypedContractMethod,
 } from "./common";
 
-export declare namespace TraceabilityMerkleRegistry {
-  export type MerkleBatchStruct = {
-    root: BytesLike;
-    fromEventId: BigNumberish;
-    toEventId: BigNumberish;
-    timestamp: BigNumberish;
-    committer: AddressLike;
-    exists: boolean;
-  };
-
-  export type MerkleBatchStructOutput = [
-    root: string,
-    fromEventId: bigint,
-    toEventId: bigint,
-    timestamp: bigint,
-    committer: string,
-    exists: boolean
-  ] & {
-    root: string;
-    fromEventId: bigint;
-    toEventId: bigint;
-    timestamp: bigint;
-    committer: string;
-    exists: boolean;
-  };
-}
-
 export interface TraceabilityMerkleRegistryInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "ROLE_AUDITOR"
+      | "ROLE_PROCESSOR"
+      | "ROLE_PRODUCER"
+      | "ROLE_RETAILER"
+      | "ROLE_TRANSPORTER"
+      | "batchCodeHashToBatchId"
+      | "batchEvents"
+      | "batchMerkleRoot"
       | "batches"
       | "bindBatchCode"
-      | "commitMerkleRoot"
-      | "commitWithBatchCode"
-      | "committer"
-      | "getBatch"
-      | "getBatchIdsByBatchCode"
-      | "isEventIncluded"
+      | "commitBatchMerkleRoot"
+      | "createBatch"
+      | "createProduct"
+      | "eventsById"
+      | "getBatchEvents"
+      | "hasRole"
+      | "nextBatchId"
+      | "nextEventId"
+      | "nextProductId"
       | "owner"
       | "pause"
       | "paused"
-      | "rootSeen"
-      | "setCommitter"
-      | "totalBatches"
+      | "products"
+      | "recordTraceEvent"
+      | "roles"
+      | "setRoles"
       | "transferOwnership"
       | "unpause"
       | "verifyWithRoot"
@@ -75,13 +60,48 @@ export interface TraceabilityMerkleRegistryInterface extends Interface {
   getEvent(
     nameOrSignatureOrTopic:
       | "BatchCodeBound"
-      | "CommitterChanged"
+      | "BatchCreated"
+      | "BatchMerkleRootCommitted"
       | "OwnershipTransferred"
       | "Paused"
-      | "RootCommitted"
+      | "ProductCreated"
+      | "RolesUpdated"
+      | "TraceEventRecorded"
       | "Unpaused"
   ): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "ROLE_AUDITOR",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "ROLE_PROCESSOR",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "ROLE_PRODUCER",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "ROLE_RETAILER",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "ROLE_TRANSPORTER",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "batchCodeHashToBatchId",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "batchEvents",
+    values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "batchMerkleRoot",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "batches",
     values: [BigNumberish]
@@ -91,37 +111,56 @@ export interface TraceabilityMerkleRegistryInterface extends Interface {
     values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "commitMerkleRoot",
-    values: [BytesLike, BigNumberish, BigNumberish]
+    functionFragment: "commitBatchMerkleRoot",
+    values: [BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "commitWithBatchCode",
-    values: [BytesLike, BigNumberish, BigNumberish, string]
+    functionFragment: "createBatch",
+    values: [BigNumberish, BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "committer", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "getBatch",
+    functionFragment: "createProduct",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "eventsById",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getBatchIdsByBatchCode",
-    values: [string]
+    functionFragment: "getBatchEvents",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "isEventIncluded",
-    values: [BytesLike, BigNumberish, BytesLike[]]
+    functionFragment: "hasRole",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "nextBatchId",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "nextEventId",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "nextProductId",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
-  encodeFunctionData(functionFragment: "rootSeen", values: [BytesLike]): string;
   encodeFunctionData(
-    functionFragment: "setCommitter",
-    values: [AddressLike]
+    functionFragment: "products",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "totalBatches",
-    values?: undefined
+    functionFragment: "recordTraceEvent",
+    values: [BigNumberish, BigNumberish, BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(functionFragment: "roles", values: [AddressLike]): string;
+  encodeFunctionData(
+    functionFragment: "setRoles",
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
@@ -133,41 +172,83 @@ export interface TraceabilityMerkleRegistryInterface extends Interface {
     values: [BytesLike, BytesLike, BytesLike[]]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "ROLE_AUDITOR",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "ROLE_PROCESSOR",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "ROLE_PRODUCER",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "ROLE_RETAILER",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "ROLE_TRANSPORTER",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "batchCodeHashToBatchId",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "batchEvents",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "batchMerkleRoot",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "batches", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "bindBatchCode",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "commitMerkleRoot",
+    functionFragment: "commitBatchMerkleRoot",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "commitWithBatchCode",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "committer", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getBatch", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "getBatchIdsByBatchCode",
+    functionFragment: "createBatch",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "isEventIncluded",
+    functionFragment: "createProduct",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "eventsById", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getBatchEvents",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "nextBatchId",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "nextEventId",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "nextProductId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "rootSeen", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "products", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "setCommitter",
+    functionFragment: "recordTraceEvent",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "totalBatches",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "roles", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "setRoles", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
@@ -181,18 +262,18 @@ export interface TraceabilityMerkleRegistryInterface extends Interface {
 
 export namespace BatchCodeBoundEvent {
   export type InputTuple = [
-    batchCodeHash: BytesLike,
     batchId: BigNumberish,
+    batchCodeHash: BytesLike,
     batchCode: string
   ];
   export type OutputTuple = [
-    batchCodeHash: string,
     batchId: bigint,
+    batchCodeHash: string,
     batchCode: string
   ];
   export interface OutputObject {
-    batchCodeHash: string;
     batchId: bigint;
+    batchCodeHash: string;
     batchCode: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
@@ -201,15 +282,46 @@ export namespace BatchCodeBoundEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace CommitterChangedEvent {
+export namespace BatchCreatedEvent {
   export type InputTuple = [
-    oldCommitter: AddressLike,
-    newCommitter: AddressLike
+    batchId: BigNumberish,
+    productId: BigNumberish,
+    creator: AddressLike,
+    initialDataHash: BytesLike
   ];
-  export type OutputTuple = [oldCommitter: string, newCommitter: string];
+  export type OutputTuple = [
+    batchId: bigint,
+    productId: bigint,
+    creator: string,
+    initialDataHash: string
+  ];
   export interface OutputObject {
-    oldCommitter: string;
-    newCommitter: string;
+    batchId: bigint;
+    productId: bigint;
+    creator: string;
+    initialDataHash: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace BatchMerkleRootCommittedEvent {
+  export type InputTuple = [
+    batchId: BigNumberish,
+    merkleRoot: BytesLike,
+    committer: AddressLike
+  ];
+  export type OutputTuple = [
+    batchId: bigint,
+    merkleRoot: string,
+    committer: string
+  ];
+  export interface OutputObject {
+    batchId: bigint;
+    merkleRoot: string;
+    committer: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -242,30 +354,68 @@ export namespace PausedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace RootCommittedEvent {
+export namespace ProductCreatedEvent {
   export type InputTuple = [
-    batchId: BigNumberish,
-    merkleRoot: BytesLike,
-    fromEventId: BigNumberish,
-    toEventId: BigNumberish,
-    timestamp: BigNumberish,
-    commiter: AddressLike
+    productId: BigNumberish,
+    owner: AddressLike,
+    name: string,
+    metadataURI: string
   ];
   export type OutputTuple = [
-    batchId: bigint,
-    merkleRoot: string,
-    fromEventId: bigint,
-    toEventId: bigint,
-    timestamp: bigint,
-    commiter: string
+    productId: bigint,
+    owner: string,
+    name: string,
+    metadataURI: string
   ];
   export interface OutputObject {
+    productId: bigint;
+    owner: string;
+    name: string;
+    metadataURI: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace RolesUpdatedEvent {
+  export type InputTuple = [account: AddressLike, roles: BigNumberish];
+  export type OutputTuple = [account: string, roles: bigint];
+  export interface OutputObject {
+    account: string;
+    roles: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace TraceEventRecordedEvent {
+  export type InputTuple = [
+    eventId: BigNumberish,
+    batchId: BigNumberish,
+    eventType: BigNumberish,
+    actor: AddressLike,
+    timestamp: BigNumberish,
+    dataHash: BytesLike
+  ];
+  export type OutputTuple = [
+    eventId: bigint,
+    batchId: bigint,
+    eventType: bigint,
+    actor: string,
+    timestamp: bigint,
+    dataHash: string
+  ];
+  export interface OutputObject {
+    eventId: bigint;
     batchId: bigint;
-    merkleRoot: string;
-    fromEventId: bigint;
-    toEventId: bigint;
+    eventType: bigint;
+    actor: string;
     timestamp: bigint;
-    commiter: string;
+    dataHash: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -328,16 +478,41 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  ROLE_AUDITOR: TypedContractMethod<[], [bigint], "view">;
+
+  ROLE_PROCESSOR: TypedContractMethod<[], [bigint], "view">;
+
+  ROLE_PRODUCER: TypedContractMethod<[], [bigint], "view">;
+
+  ROLE_RETAILER: TypedContractMethod<[], [bigint], "view">;
+
+  ROLE_TRANSPORTER: TypedContractMethod<[], [bigint], "view">;
+
+  batchCodeHashToBatchId: TypedContractMethod<
+    [arg0: BytesLike],
+    [bigint],
+    "view"
+  >;
+
+  batchEvents: TypedContractMethod<
+    [arg0: BigNumberish, arg1: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
+  batchMerkleRoot: TypedContractMethod<[arg0: BigNumberish], [string], "view">;
+
   batches: TypedContractMethod<
     [arg0: BigNumberish],
     [
-      [string, bigint, bigint, bigint, string, boolean] & {
-        root: string;
-        fromEventId: bigint;
-        toEventId: bigint;
-        timestamp: bigint;
-        committer: string;
+      [bigint, string, string, string, boolean, boolean, string] & {
+        productId: bigint;
+        creator: string;
+        currentOwner: string;
+        initialDataHash: string;
         exists: boolean;
+        closed: boolean;
+        pendingReceiver: string;
       }
     ],
     "view"
@@ -349,42 +524,55 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
     "nonpayable"
   >;
 
-  commitMerkleRoot: TypedContractMethod<
-    [merkleRoot: BytesLike, fromEventId: BigNumberish, toEventId: BigNumberish],
+  commitBatchMerkleRoot: TypedContractMethod<
+    [batchId: BigNumberish, merkleRoot: BytesLike],
+    [void],
+    "nonpayable"
+  >;
+
+  createBatch: TypedContractMethod<
+    [productId: BigNumberish, initialDataHash: BytesLike],
     [bigint],
     "nonpayable"
   >;
 
-  commitWithBatchCode: TypedContractMethod<
+  createProduct: TypedContractMethod<
+    [name: string, metadataURI: string],
+    [bigint],
+    "nonpayable"
+  >;
+
+  eventsById: TypedContractMethod<
+    [arg0: BigNumberish],
     [
-      merkleRoot: BytesLike,
-      fromEventId: BigNumberish,
-      toEventId: BigNumberish,
-      batchCode: string
+      [bigint, bigint, string, bigint, string] & {
+        batchId: bigint;
+        eventType: bigint;
+        actor: string;
+        timestamp: bigint;
+        dataHash: string;
+      }
     ],
-    [bigint],
-    "nonpayable"
-  >;
-
-  committer: TypedContractMethod<[], [string], "view">;
-
-  getBatch: TypedContractMethod<
-    [batchId: BigNumberish],
-    [TraceabilityMerkleRegistry.MerkleBatchStructOutput],
     "view"
   >;
 
-  getBatchIdsByBatchCode: TypedContractMethod<
-    [batchCode: string],
+  getBatchEvents: TypedContractMethod<
+    [batchId: BigNumberish],
     [bigint[]],
     "view"
   >;
 
-  isEventIncluded: TypedContractMethod<
-    [leaf: BytesLike, batchId: BigNumberish, proof: BytesLike[]],
+  hasRole: TypedContractMethod<
+    [account: AddressLike, role: BigNumberish],
     [boolean],
     "view"
   >;
+
+  nextBatchId: TypedContractMethod<[], [bigint], "view">;
+
+  nextEventId: TypedContractMethod<[], [bigint], "view">;
+
+  nextProductId: TypedContractMethod<[], [bigint], "view">;
 
   owner: TypedContractMethod<[], [string], "view">;
 
@@ -392,15 +580,37 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
 
   paused: TypedContractMethod<[], [boolean], "view">;
 
-  rootSeen: TypedContractMethod<[arg0: BytesLike], [boolean], "view">;
+  products: TypedContractMethod<
+    [arg0: BigNumberish],
+    [
+      [string, string, string, boolean] & {
+        name: string;
+        metadataURI: string;
+        owner: string;
+        exists: boolean;
+      }
+    ],
+    "view"
+  >;
 
-  setCommitter: TypedContractMethod<
-    [newCommitter: AddressLike],
+  recordTraceEvent: TypedContractMethod<
+    [
+      batchId: BigNumberish,
+      eventType: BigNumberish,
+      dataHash: BytesLike,
+      receiver: AddressLike
+    ],
     [void],
     "nonpayable"
   >;
 
-  totalBatches: TypedContractMethod<[], [bigint], "view">;
+  roles: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+
+  setRoles: TypedContractMethod<
+    [account: AddressLike, newRoles: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
@@ -421,17 +631,46 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
   ): T;
 
   getFunction(
+    nameOrSignature: "ROLE_AUDITOR"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "ROLE_PROCESSOR"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "ROLE_PRODUCER"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "ROLE_RETAILER"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "ROLE_TRANSPORTER"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "batchCodeHashToBatchId"
+  ): TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "batchEvents"
+  ): TypedContractMethod<
+    [arg0: BigNumberish, arg1: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "batchMerkleRoot"
+  ): TypedContractMethod<[arg0: BigNumberish], [string], "view">;
+  getFunction(
     nameOrSignature: "batches"
   ): TypedContractMethod<
     [arg0: BigNumberish],
     [
-      [string, bigint, bigint, bigint, string, boolean] & {
-        root: string;
-        fromEventId: bigint;
-        toEventId: bigint;
-        timestamp: bigint;
-        committer: string;
+      [bigint, string, string, string, boolean, boolean, string] & {
+        productId: bigint;
+        creator: string;
+        currentOwner: string;
+        initialDataHash: string;
         exists: boolean;
+        closed: boolean;
+        pendingReceiver: string;
       }
     ],
     "view"
@@ -444,44 +683,60 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "commitMerkleRoot"
+    nameOrSignature: "commitBatchMerkleRoot"
   ): TypedContractMethod<
-    [merkleRoot: BytesLike, fromEventId: BigNumberish, toEventId: BigNumberish],
+    [batchId: BigNumberish, merkleRoot: BytesLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "createBatch"
+  ): TypedContractMethod<
+    [productId: BigNumberish, initialDataHash: BytesLike],
     [bigint],
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "commitWithBatchCode"
+    nameOrSignature: "createProduct"
   ): TypedContractMethod<
+    [name: string, metadataURI: string],
+    [bigint],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "eventsById"
+  ): TypedContractMethod<
+    [arg0: BigNumberish],
     [
-      merkleRoot: BytesLike,
-      fromEventId: BigNumberish,
-      toEventId: BigNumberish,
-      batchCode: string
+      [bigint, bigint, string, bigint, string] & {
+        batchId: bigint;
+        eventType: bigint;
+        actor: string;
+        timestamp: bigint;
+        dataHash: string;
+      }
     ],
-    [bigint],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "committer"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "getBatch"
-  ): TypedContractMethod<
-    [batchId: BigNumberish],
-    [TraceabilityMerkleRegistry.MerkleBatchStructOutput],
     "view"
   >;
   getFunction(
-    nameOrSignature: "getBatchIdsByBatchCode"
-  ): TypedContractMethod<[batchCode: string], [bigint[]], "view">;
+    nameOrSignature: "getBatchEvents"
+  ): TypedContractMethod<[batchId: BigNumberish], [bigint[]], "view">;
   getFunction(
-    nameOrSignature: "isEventIncluded"
+    nameOrSignature: "hasRole"
   ): TypedContractMethod<
-    [leaf: BytesLike, batchId: BigNumberish, proof: BytesLike[]],
+    [account: AddressLike, role: BigNumberish],
     [boolean],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "nextBatchId"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "nextEventId"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "nextProductId"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
@@ -492,14 +747,41 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
     nameOrSignature: "paused"
   ): TypedContractMethod<[], [boolean], "view">;
   getFunction(
-    nameOrSignature: "rootSeen"
-  ): TypedContractMethod<[arg0: BytesLike], [boolean], "view">;
+    nameOrSignature: "products"
+  ): TypedContractMethod<
+    [arg0: BigNumberish],
+    [
+      [string, string, string, boolean] & {
+        name: string;
+        metadataURI: string;
+        owner: string;
+        exists: boolean;
+      }
+    ],
+    "view"
+  >;
   getFunction(
-    nameOrSignature: "setCommitter"
-  ): TypedContractMethod<[newCommitter: AddressLike], [void], "nonpayable">;
+    nameOrSignature: "recordTraceEvent"
+  ): TypedContractMethod<
+    [
+      batchId: BigNumberish,
+      eventType: BigNumberish,
+      dataHash: BytesLike,
+      receiver: AddressLike
+    ],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
-    nameOrSignature: "totalBatches"
-  ): TypedContractMethod<[], [bigint], "view">;
+    nameOrSignature: "roles"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "setRoles"
+  ): TypedContractMethod<
+    [account: AddressLike, newRoles: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
@@ -522,11 +804,18 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
     BatchCodeBoundEvent.OutputObject
   >;
   getEvent(
-    key: "CommitterChanged"
+    key: "BatchCreated"
   ): TypedContractEvent<
-    CommitterChangedEvent.InputTuple,
-    CommitterChangedEvent.OutputTuple,
-    CommitterChangedEvent.OutputObject
+    BatchCreatedEvent.InputTuple,
+    BatchCreatedEvent.OutputTuple,
+    BatchCreatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "BatchMerkleRootCommitted"
+  ): TypedContractEvent<
+    BatchMerkleRootCommittedEvent.InputTuple,
+    BatchMerkleRootCommittedEvent.OutputTuple,
+    BatchMerkleRootCommittedEvent.OutputObject
   >;
   getEvent(
     key: "OwnershipTransferred"
@@ -543,11 +832,25 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
     PausedEvent.OutputObject
   >;
   getEvent(
-    key: "RootCommitted"
+    key: "ProductCreated"
   ): TypedContractEvent<
-    RootCommittedEvent.InputTuple,
-    RootCommittedEvent.OutputTuple,
-    RootCommittedEvent.OutputObject
+    ProductCreatedEvent.InputTuple,
+    ProductCreatedEvent.OutputTuple,
+    ProductCreatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RolesUpdated"
+  ): TypedContractEvent<
+    RolesUpdatedEvent.InputTuple,
+    RolesUpdatedEvent.OutputTuple,
+    RolesUpdatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "TraceEventRecorded"
+  ): TypedContractEvent<
+    TraceEventRecordedEvent.InputTuple,
+    TraceEventRecordedEvent.OutputTuple,
+    TraceEventRecordedEvent.OutputObject
   >;
   getEvent(
     key: "Unpaused"
@@ -558,7 +861,7 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
   >;
 
   filters: {
-    "BatchCodeBound(bytes32,uint256,string)": TypedContractEvent<
+    "BatchCodeBound(uint256,bytes32,string)": TypedContractEvent<
       BatchCodeBoundEvent.InputTuple,
       BatchCodeBoundEvent.OutputTuple,
       BatchCodeBoundEvent.OutputObject
@@ -569,15 +872,26 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
       BatchCodeBoundEvent.OutputObject
     >;
 
-    "CommitterChanged(address,address)": TypedContractEvent<
-      CommitterChangedEvent.InputTuple,
-      CommitterChangedEvent.OutputTuple,
-      CommitterChangedEvent.OutputObject
+    "BatchCreated(uint256,uint256,address,bytes32)": TypedContractEvent<
+      BatchCreatedEvent.InputTuple,
+      BatchCreatedEvent.OutputTuple,
+      BatchCreatedEvent.OutputObject
     >;
-    CommitterChanged: TypedContractEvent<
-      CommitterChangedEvent.InputTuple,
-      CommitterChangedEvent.OutputTuple,
-      CommitterChangedEvent.OutputObject
+    BatchCreated: TypedContractEvent<
+      BatchCreatedEvent.InputTuple,
+      BatchCreatedEvent.OutputTuple,
+      BatchCreatedEvent.OutputObject
+    >;
+
+    "BatchMerkleRootCommitted(uint256,bytes32,address)": TypedContractEvent<
+      BatchMerkleRootCommittedEvent.InputTuple,
+      BatchMerkleRootCommittedEvent.OutputTuple,
+      BatchMerkleRootCommittedEvent.OutputObject
+    >;
+    BatchMerkleRootCommitted: TypedContractEvent<
+      BatchMerkleRootCommittedEvent.InputTuple,
+      BatchMerkleRootCommittedEvent.OutputTuple,
+      BatchMerkleRootCommittedEvent.OutputObject
     >;
 
     "OwnershipTransferred(address,address)": TypedContractEvent<
@@ -602,15 +916,37 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
       PausedEvent.OutputObject
     >;
 
-    "RootCommitted(uint256,bytes32,uint256,uint256,uint64,address)": TypedContractEvent<
-      RootCommittedEvent.InputTuple,
-      RootCommittedEvent.OutputTuple,
-      RootCommittedEvent.OutputObject
+    "ProductCreated(uint256,address,string,string)": TypedContractEvent<
+      ProductCreatedEvent.InputTuple,
+      ProductCreatedEvent.OutputTuple,
+      ProductCreatedEvent.OutputObject
     >;
-    RootCommitted: TypedContractEvent<
-      RootCommittedEvent.InputTuple,
-      RootCommittedEvent.OutputTuple,
-      RootCommittedEvent.OutputObject
+    ProductCreated: TypedContractEvent<
+      ProductCreatedEvent.InputTuple,
+      ProductCreatedEvent.OutputTuple,
+      ProductCreatedEvent.OutputObject
+    >;
+
+    "RolesUpdated(address,uint256)": TypedContractEvent<
+      RolesUpdatedEvent.InputTuple,
+      RolesUpdatedEvent.OutputTuple,
+      RolesUpdatedEvent.OutputObject
+    >;
+    RolesUpdated: TypedContractEvent<
+      RolesUpdatedEvent.InputTuple,
+      RolesUpdatedEvent.OutputTuple,
+      RolesUpdatedEvent.OutputObject
+    >;
+
+    "TraceEventRecorded(uint256,uint256,uint8,address,uint64,bytes32)": TypedContractEvent<
+      TraceEventRecordedEvent.InputTuple,
+      TraceEventRecordedEvent.OutputTuple,
+      TraceEventRecordedEvent.OutputObject
+    >;
+    TraceEventRecorded: TypedContractEvent<
+      TraceEventRecordedEvent.InputTuple,
+      TraceEventRecordedEvent.OutputTuple,
+      TraceEventRecordedEvent.OutputObject
     >;
 
     "Unpaused(address)": TypedContractEvent<

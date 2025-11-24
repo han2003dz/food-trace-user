@@ -5,6 +5,7 @@ import type { CreateBatchFormData } from "@/types/form";
 export interface UpdateBatchStatusPayload {
   event_type: string;
   metadata_uri?: string | null;
+  receiver_wallet?: string | null;
 }
 
 export const createBatch = async (data: CreateBatchFormData) => {
@@ -24,7 +25,7 @@ export const getBatchByUser = async (): Promise<Batch[]> => {
 };
 
 export const getBatchDetailById = async (id: string): Promise<BatchDetail> => {
-  const res = await api().get(`/batches/${id}`);
+  const res = await api().get(`/batches/${id}/detail`);
   return res.data;
 };
 
@@ -54,6 +55,6 @@ export const updateBatchStatus = async (
   batchId: string,
   data: UpdateBatchStatusPayload
 ) => {
-  const res = await api().post(`/batches/${batchId}/update-status`, data);
+  const res = await api().patch(`/batches/${batchId}/transfer`, data);
   return res.data;
 };

@@ -11,6 +11,7 @@ import CreateBatch from "./pages/CreateBatch";
 import ProductManagement from "./pages/Products";
 import CreateProduct from "./pages/CreateProduct";
 import CreateOrganization from "./pages/Orgnizations";
+import TransferBatchPage from "./pages/TransferBatch";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/trace" element={<TraceDetail />} />
           <Route path="/scan" element={<QRScanner />} />
           <Route path="/batches/:id" element={<BatchDetail />} />
+          <Route path="batches/:id/transfer" element={<TransferBatchPage />} />
           <Route path="organizations" element={<CreateOrganization />} />
         </Route>
 

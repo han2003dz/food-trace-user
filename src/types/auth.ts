@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface IAccessTokens {
   accessToken: string;
 }
@@ -15,4 +16,5 @@ export interface IUser {
   role: string;
   createdAt: string;
   updatedAt: string;
+  organization: any;
 }
