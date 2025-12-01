@@ -1,32 +1,40 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, ExternalLink, CheckCircle2, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  ExternalLink,
+  CheckCircle2,
+  Loader2,
+  ArrowRightLeft,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import QRCode from "react-qr-code";
 import { getCategoryName } from "@/utils/categories";
-import { useGetBatchDetailById, useUpdateBatchStatus } from "@/hooks/useBatch";
+import { useGetBatchDetailById } from "@/hooks/useBatch";
 import { statusColors } from "@/constants/batch";
 import { useIsMobile } from "@/hooks/useMobile";
-import { useState } from "react";
-import { Input } from "@/components/ui/Input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/Select";
+// import { useState } from "react";
+// import { Input } from "@/components/ui/Input";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/Select";
+import { timelineIcons } from "@/constants/timeline";
+import { useUserStore } from "@/stores/useUserStore";
 
-const EVENT_TYPES = [
-  "PROCESSED",
-  "SHIPPED",
-  "RECEIVED",
-  "STORED",
-  "SOLD",
-  "RECALLED",
-] as const;
+// const EVENT_TYPES = [
+//   "PROCESSED",
+//   "SHIPPED",
+//   "RECEIVED",
+//   "STORED",
+//   "SOLD",
+//   "RECALLED",
+// ] as const;
 
 const BatchDetail = () => {
   const { id } = useParams();
@@ -34,22 +42,21 @@ const BatchDetail = () => {
   const isMobile = useIsMobile();
 
   const { data: batch, isLoading, error } = useGetBatchDetailById(id!);
-  const { mutate: updateStatus, isPending } = useUpdateBatchStatus();
+  // const { mutate: updateStatus, isPending } = useUpdateBatchStatus();
+  // const [selectedEventType, setSelectedEventType] = useState<string>("SHIPPED");
+  // const [metadataUri, setMetadataUri] = useState<string>("");
+  const { userDetail } = useUserStore();
+  // const handleUpdateStatus = () => {
+  //   if (!id) return;
 
-  const [selectedEventType, setSelectedEventType] = useState<string>("SHIPPED");
-  const [metadataUri, setMetadataUri] = useState<string>("");
-
-  const handleUpdateStatus = () => {
-    if (!id) return;
-
-    updateStatus({
-      batchId: id,
-      data: {
-        event_type: selectedEventType,
-        metadata_uri: metadataUri || undefined,
-      },
-    });
-  };
+  //   updateStatus({
+  //     batchId: id,
+  //     data: {
+  //       event_type: selectedEventType,
+  //       metadata_uri: metadataUri || undefined,
+  //     },
+  //   });
+  // };
 
   if (isLoading)
     return (
@@ -92,9 +99,7 @@ const BatchDetail = () => {
           <div className="absolute -inset-0.5 bg-linear-to-r from-primary/30 to-secondary/30 rounded-2xl opacity-0 group-hover:opacity-100 blur transition-opacity duration-500" />
 
           <div className="relative bg-glass-gradient backdrop-blur-xl border border-border/50 rounded-2xl p-6 h-full">
-            <h2 className="text-xl font-semibold mb-6">
-              Supply Chain Timeline
-            </h2>
+            <h2 className="text-xl font-semibold mb-6">Timeline</h2>
 
             <div className="space-y-6">
               {timeline.length === 0 && (
@@ -118,8 +123,10 @@ const BatchDetail = () => {
 
                   {/* Icon */}
                   <div className="relative z-10 shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary to-secondary flex items-center justify-center text-2xl shadow-lg">
-                      🔗
+                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary to-secondary flex items-center justify-center shadow-lg">
+                      {timelineIcons[event.event_type] ?? (
+                        <ArrowRightLeft className="w-6 h-6 text-white" />
+                      )}
                     </div>
                     <CheckCircle2 className="absolute -bottom-1 -right-1 w-5 h-5 text-secondary bg-background rounded-full" />
                   </div>
@@ -232,9 +239,11 @@ const BatchDetail = () => {
           >
             <div className="absolute -inset-0.5 bg-linear-to-r from-primary/20 to-secondary/20 rounded-2xl opacity-0 group-hover:opacity-100 blur transition-opacity duration-500" />
             <div className="relative bg-glass-gradient backdrop-blur-xl border border-border/50 rounded-2xl p-6 space-y-4">
-              <h3 className="text-lg font-semibold">Update Batch Status</h3>
+              <h3 className="text-lg font-semibold cursor-pointer hover:text-blue-600">
+                Chuyển giao
+              </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm text-muted-foreground">
                     Event Type
@@ -267,17 +276,16 @@ const BatchDetail = () => {
                     onChange={(e) => setMetadataUri(e.target.value)}
                   />
                 </div>
-              </div>
-
-              <Button
-                className="w-full mt-2 gap-2"
-                onClick={handleUpdateStatus}
-                disabled={isPending}
-              >
-                {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                <CheckCircle2 className="w-4 h-4" />
-                {isPending ? "Updating..." : "Update Status On-chain"}
-              </Button>
+              </div> */}
+              {userDetail?.role !== "CONSUMER" && (
+                <Button
+                  className="w-full mt-2 gap-2"
+                  onClick={() => navigate(`/batches/${id}/transfer`)}
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  Chuyển giao
+                </Button>
+              )}
             </div>
           </motion.div>
         </div>

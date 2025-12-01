@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
 import { BackButton } from "@/components/common/BackButton";
@@ -10,20 +10,23 @@ import { ProgressBar } from "@/components/common/ProgressBar";
 import { CreateBatchForm } from "@/components/pages/create-batch/CreateBatchForm";
 import type { CreateBatchFormData, HandleChangeFormData } from "@/types/form";
 
-import { useGetOrganizationByUser } from "@/hooks/useOrganizations";
 import { useGetListProductsByOwner } from "@/hooks/useProducts";
-
 import { createBatch } from "@/services/batches";
 import { CreateBatchNoti } from "@/components/pages/create-batch/CreateBatchNoti";
+import { useUserStore } from "@/stores/useUserStore";
+import { useTransferBatch } from "@/hooks/contracts/useTransfer";
+import { useGetBatch } from "@/hooks/contracts/useGetBatch";
 
-const steps = ["Select Product", "Initial Batch Data", "Review"];
+const steps = ["Chọn sản phẩm", "Thông tin lô hàng", "Xem lại"];
 
 const CreateBatch = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false); // ✅ Loading state
 
-  const { data: organization } = useGetOrganizationByUser();
   const { data: products } = useGetListProductsByOwner();
+  const { transfer } = useTransferBatch();
+  const { userDetail } = useUserStore();
 
   const [formData, setFormData] = useState<CreateBatchFormData>({
     product_id: "",
@@ -31,15 +34,21 @@ const CreateBatch = () => {
     metadata_uri: "",
   });
 
-  // Set creator_org_id khi org load xong
   useEffect(() => {
-    if (organization?.id) {
+    if (userDetail?.organization?.id) {
       setFormData((prev) => ({
         ...prev,
-        creator_org_id: organization.id,
+        creator_org_id: userDetail.organization.id,
       }));
     }
-  }, [organization]);
+  }, [userDetail]);
+
+  const { batch } = useGetBatch(27);
+  console.log("batch", batch);
+
+  useEffect(() => {
+    if (batch) console.log("Batch info:", batch);
+  }, [batch]);
 
   const handleChangeFormData: HandleChangeFormData = (eOrName, value) => {
     if (typeof eOrName === "string") {
@@ -51,11 +60,9 @@ const CreateBatch = () => {
   };
 
   const handleNext = () => {
-    if (currentStep === 0) {
-      if (!formData.product_id) {
-        toast.error("Please select a product");
-        return;
-      }
+    if (currentStep === 0 && !formData.product_id) {
+      toast.error("Vui lòng chọn sản phẩm");
+      return;
     }
     setCurrentStep((prev) => prev + 1);
   };
@@ -66,10 +73,13 @@ const CreateBatch = () => {
 
   const handleSubmit = async () => {
     try {
+      setLoading(true); // ⏳ Bắt đầu loading
       await createBatch(formData);
       setIsSubmitted(true);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to create batch");
+      toast.error(err.response?.data?.message || "Không thể tạo lô hàng");
+    } finally {
+      setLoading(false); // ⏳ Tắt loading
     }
   };
 
@@ -79,14 +89,16 @@ const CreateBatch = () => {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <BackButton to={"/batches"} title={"Back to Batches"} />
+      <BackButton to={"/batches"} title={"Quay lại danh sách lô hàng"} />
 
       <div>
-        <h1 className="text-3xl font-bold">Create New Batch</h1>
+        <h1 className="text-3xl font-bold">Tạo Lô Hàng Mới</h1>
         <p className="text-muted-foreground mt-1">
-          Add a new batch for your product
+          Thêm lô hàng mới cho sản phẩm của bạn
         </p>
       </div>
+
+      <Button onClick={transfer}>Chuyển giao</Button>
 
       <ProgressBar
         steps={steps}
@@ -113,22 +125,31 @@ const CreateBatch = () => {
             <Button
               variant="outline"
               onClick={handleBack}
-              disabled={currentStep === 0}
+              disabled={currentStep === 0 || loading}
               className="gap-2"
             >
-              <ArrowLeft className="w-4 h-4" /> Back
+              <ArrowLeft className="w-4 h-4" /> Quay lại
             </Button>
 
             {currentStep < steps.length - 1 ? (
-              <Button onClick={handleNext} className="gap-2">
-                Next <ArrowRight className="w-4 h-4" />
+              <Button onClick={handleNext} disabled={loading} className="gap-2">
+                Tiếp tục <ArrowRight className="w-4 h-4" />
               </Button>
             ) : (
               <Button
                 onClick={handleSubmit}
+                disabled={loading}
                 className="gap-2 bg-linear-to-r from-primary to-secondary"
               >
-                <CheckCircle2 className="w-4 h-4" /> Submit Batch
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Đang tạo...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" /> Hoàn tất tạo lô hàng
+                  </>
+                )}
               </Button>
             )}
           </div>

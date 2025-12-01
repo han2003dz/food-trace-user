@@ -7,174 +7,110 @@ import {
   useSignMessage,
   useSmartAccountClient,
 } from "@account-kit/react";
-import { useMutation } from "@tanstack/react-query";
-import { useUserProfile } from "./useUser";
-import useUserStore from "@/stores/useUserStore";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { IUser } from "@/types/auth";
-
-const useGetNonce = () => {
-  return useMutation({
-    mutationFn: getNonce,
-  });
-};
-
-const useLogin = () => {
-  return useMutation({
-    mutationFn: login,
-  });
-};
-
-export const useAuthentication = () => {
-  const { client, address } = useSmartAccountClient({});
-  const { logout } = useLogout();
-
-  const { mutateAsync: getNonceAsync } = useGetNonce();
-  const { mutateAsync: loginToSystem } = useLogin();
-  const { mutateAsync: getUserProfile } = useUserProfile();
-
-  const userDetail = useUserStore((s) => s.userDetail);
-  const setUserDetail = useUserStore((s) => s.setUserDetail);
-  const setAuth = useUserStore((s) => s.setAuth);
-  const hasSignedMessage = useUserStore((s) => s.hasSignedMessage);
-
-  const [isSigning, setIsSigning] = useState(false);
-  const [shouldShowSignPopup, setShouldShowSignPopup] = useState(
-    !hasSignedMessage()
-  );
-  const isLoggingRef = useRef(false);
-
-  const { signMessageAsync } = useSignMessage({ client });
-
-  useEffect(() => {
-    setShouldShowSignPopup(!hasSignedMessage());
-  }, [hasSignedMessage]);
-
-  const handleLogout = useCallback(() => {
-    logout();
-    setAuth(null);
-    setUserDetail(null);
-    setShouldShowSignPopup(false);
-    localStorage.clear();
-  }, [logout, setAuth, setUserDetail]);
-
-  const handleSignMessage = async () => {
-    if (!address || !client || isSigning || isLoggingRef.current) return;
-
-    try {
-      isLoggingRef.current = true;
-      setIsSigning(true);
-
-      const nonce = await getNonceAsync(address);
-      const message = typeof nonce.nonce === "string" ? nonce.nonce : "";
-      const signature = await signMessageAsync({ message: message });
-      const loginResponse = await loginToSystem({
-        wallet_address: address,
-        signature,
-      });
-
-      if (loginResponse?.access_token) {
-        setAuth({
-          tokens: { accessToken: loginResponse.access_token },
-          wallet_address: address,
-        });
-      }
-
-      const userProfile = await getUserProfile();
-      console.log("userProfile", userProfile);
-      setUserDetail(userProfile as IUser);
-      setShouldShowSignPopup(false);
-    } catch {
-      handleLogout();
-    } finally {
-      setIsSigning(false);
-      isLoggingRef.current = false;
-    }
-  };
-
-  useEffect(() => {
-    const init = async () => {
-      if (userDetail && userDetail.wallet_address === address) {
-        try {
-          const profile = await getUserProfile();
-          setUserDetail(profile as IUser);
-          setShouldShowSignPopup(false);
-        } catch {
-          handleLogout();
-        }
-        return;
-      }
-
-      if (!userDetail && address) {
-        setShouldShowSignPopup(true);
-      }
-    };
-
-    init();
-  }, [userDetail, address, getUserProfile, setUserDetail, handleLogout]);
-  return {
-    handleSignMessage,
-    handleLogout,
-    isSigning,
-    shouldShowSignPopup,
-    setShouldShowSignPopup,
-  };
-};
+import { useCallback, useEffect, useState } from "react";
+import { clearLocalStorage, useAppLogout } from "@/stores/useLogout";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useUserStore } from "@/stores/useUserStore";
+import { getUserProfile } from "@/services/user";
+import { toast } from "sonner";
 
 export const useWalletConnect = () => {
-  const { openAuthModal } = useAuthModal();
-  const { logout } = useLogout();
-  const { address } = useSmartAccountClient({});
-  const signerStatus = useSignerStatus();
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const connectWallet = async () => {
+
+  const { openAuthModal } = useAuthModal();
+  const signerStatus = useSignerStatus();
+  const { address } = useSmartAccountClient({});
+  const { logout: fullLogout } = useAppLogout();
+
+  const connectWallet = useCallback(async () => {
     try {
       setIsConnecting(true);
       setError(null);
       openAuthModal();
     } catch (err: any) {
-      console.error("Connect wallet error:", err);
       setError(err?.message || "Failed to connect wallet");
-      logout();
+      fullLogout();
     } finally {
       setIsConnecting(false);
     }
-  };
+  }, [openAuthModal, fullLogout]);
 
-  const isConnected = signerStatus.isConnected;
-  const isAuthenticating =
-    signerStatus.isAuthenticating || signerStatus.isInitializing;
+  const disconnectWallet = useCallback(() => {
+    fullLogout();
+  }, [fullLogout]);
 
   return {
     connectWallet,
+    disconnectWallet,
     isConnecting,
-    isConnected,
-    isAuthenticating,
+    isConnected: signerStatus.isConnected,
+    isAuthenticating:
+      signerStatus.isAuthenticating || signerStatus.isInitializing,
     error,
-    logout,
     address,
   };
 };
 
-export function useAuthStatus() {
-  const hasSignedMessage = useUserStore((state) => state.hasSignedMessage());
-  const { isConnected } = useWalletConnect();
+export const useLoginToSystem = () => {
+  const isLoggingIn = useAuthStore((s) => s.isLoggingIn);
+  const setIsLoggingIn = useAuthStore((s) => s.setIsLoggingIn);
 
-  const status = useMemo(() => {
-    if (!isConnected) return "disconnected";
-    if (isConnected && !hasSignedMessage) return "connected";
-    if (isConnected && hasSignedMessage) return "authenticated";
-    return "disconnected";
-  }, [isConnected, hasSignedMessage]);
+  const loginError = useAuthStore((s) => s.loginError);
+  const setLoginError = useAuthStore((s) => s.setLoginError);
 
-  const isDisconnected = status === "disconnected";
-  const isAuthenticated = status === "authenticated";
+  const logoutFlag = useAuthStore((s) => s.logoutFlag);
+  const setUserDetail = useUserStore((s) => s.setUserDetail);
+  const setAuth = useAuthStore((s) => s.setAuth);
+  const accessToken = useAuthStore((s) => s.auth?.tokens?.accessToken ?? null);
 
-  return {
-    status,
-    isDisconnected,
-    isConnected,
-    isAuthenticated,
-  };
-}
+  const { client, address } = useSmartAccountClient({});
+  const { logout: alchemyLogout } = useLogout();
+  const { signMessageAsync } = useSignMessage({ client });
+  const loginToSystem = useCallback(async () => {
+    if (accessToken || logoutFlag || loginError || !address) return;
+    try {
+      setIsLoggingIn(true);
+      setLoginError(false);
+      const nonceRes = await getNonce(address);
+      const signature = await signMessageAsync({ message: nonceRes.nonce });
+
+      const loginResponse = await login({ wallet_address: address, signature });
+
+      setAuth({
+        tokens: { accessToken: loginResponse.access_token },
+        wallet_address: address,
+      });
+
+      const profile = await getUserProfile();
+      toast.success("Login successful");
+      setUserDetail(profile);
+    } catch (err: any) {
+      console.log("Login error:", err);
+      toast.error("Failed to login");
+      setLoginError(true);
+      alchemyLogout();
+      clearLocalStorage();
+    } finally {
+      setIsLoggingIn(false);
+    }
+  }, [
+    address,
+    accessToken,
+    logoutFlag,
+    setAuth,
+    setUserDetail,
+    signMessageAsync,
+    alchemyLogout,
+    setIsLoggingIn,
+    setLoginError,
+    loginError,
+  ]);
+
+  useEffect(() => {
+    if (!logoutFlag && address && !accessToken && !isLoggingIn) {
+      loginToSystem();
+    }
+  }, [address, accessToken, logoutFlag, isLoggingIn, loginToSystem]);
+  return { isLoggingIn, loginError };
+};

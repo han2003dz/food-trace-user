@@ -1,4 +1,9 @@
-export type OrgType = "PRODUCER" | "LOGISTICS" | "RETAILER" | "AUDITOR";
+export type OrgType =
+  | "PRODUCER"
+  | "PROCESSOR"
+  | "RETAILER"
+  | "AUDITOR"
+  | "TRANSPORTER";
 
 export const ORG_TYPE_ROLES: Record<
   OrgType,
@@ -8,8 +13,13 @@ export const ORG_TYPE_ROLES: Record<
     label: "Producer",
     description: "Create and manage products from origin",
   },
-  LOGISTICS: {
-    label: "Logistics Provider",
+  PROCESSOR: {
+    label: "Processor Provider",
+    description: "Transport and track shipments",
+  },
+
+  TRANSPORTER: {
+    label: "TRANSPORTER Provider",
     description: "Transport and track shipments",
   },
   RETAILER: {

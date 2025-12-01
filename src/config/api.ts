@@ -1,46 +1,44 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { API_URL } from "@/constants/environment";
-import useUserStore from "@/stores/useUserStore";
 import axios from "axios";
+
+import { useAuthStore } from "../stores/useAuthStore";
+import { API_URL } from "../constants/environment";
+import { clearLocalStorage } from "../stores/useLogout";
 
 const contentType = "application/json";
 const headers = { "Content-Type": contentType };
 
 export function getAccessToken() {
   try {
-    const tokens = getToken();
-    if (!tokens) return null;
-
-    return tokens?.accessToken;
+    const tokens = useAuthStore.getState()?.auth?.tokens;
+    return tokens?.accessToken ?? null;
   } catch {
     return null;
   }
 }
 
-const getToken = () => useUserStore.getState()?.auth?.tokens;
-
 export const api = () => {
   const accessToken = getAccessToken();
-  const client = accessToken
-    ? axios.create({
-        baseURL: API_URL,
-        headers: { ...headers, Authorization: `Bearer ${accessToken}` },
-      })
-    : axios.create({
-        baseURL: API_URL,
-        headers,
-      });
+
+  const client = axios.create({
+    baseURL: API_URL,
+    headers: accessToken
+      ? { ...headers, Authorization: `Bearer ${accessToken}` }
+      : headers,
+  });
 
   const onSuccess = (response: any) => response;
-  const onError = (err: any) => {
-    if (err.response.status === 401 && accessToken) {
-      localStorage.removeItem("user-storage");
-      localStorage.removeItem("walletConnected");
-      useUserStore.getState().setAuth(null);
-      useUserStore.getState().setUserDetail(null);
 
+  const onError = (err: any) => {
+    const status = err?.response?.status;
+
+    if (status === 401 && accessToken) {
+      console.warn("401 Unauthorized → Auto logout");
+
+      clearLocalStorage();
       window.location.reload();
     }
+
     return Promise.reject(err);
   };
 

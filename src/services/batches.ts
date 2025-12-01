@@ -9,7 +9,6 @@ export interface UpdateBatchStatusPayload {
 }
 
 export const createBatch = async (data: CreateBatchFormData) => {
-  console.log("data", data);
   const payload = {
     product_id: data.product_id,
     creator_org_id: data.creator_org_id,

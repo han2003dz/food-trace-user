@@ -10,9 +10,10 @@ import { BackButton } from "@/components/common/BackButton";
 import { ProgressBar } from "@/components/common/ProgressBar";
 import type { CreateProductFormData, HandleChangeFormData } from "@/types/form";
 import { CreateProductForm } from "@/components/pages/create-product/CreateProduct";
+import { useUserStore } from "@/stores/useUserStore";
 import { useCreateProduct } from "@/hooks/useProducts";
 
-const steps = ["Basic Info", "Origin Details", "Review & Submit"];
+const steps = ["Thông tin cơ bản", "Nguồn gốc sản phẩm", "Xem lại & Gửi"];
 
 const CreateProduct = () => {
   const navigate = useNavigate();
@@ -20,12 +21,13 @@ const CreateProduct = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { userDetail } = useUserStore();
   const { mutateAsync } = useCreateProduct();
   const [formData, setFormData] = useState<CreateProductFormData>({
     name: "",
     description: "",
     category: "",
-    producer_name: "",
+    producer_name: userDetail?.organization.name || "",
     origin: "",
     image_url: null,
     manufacture_date: undefined,
@@ -36,37 +38,36 @@ const CreateProduct = () => {
 
   const validateStep = (step: number): boolean => {
     switch (step) {
-      case 0: // Basic Info
+      case 0:
         if (!formData.name.trim()) {
-          toast.error("Product name is required");
+          toast.error("Tên sản phẩm là bắt buộc");
           return false;
         }
         if (!formData.category) {
-          toast.error("Category is required");
+          toast.error("Danh mục là bắt buộc");
           return false;
         }
         if (!formData.manufacture_date) {
-          toast.error("Manufacture date is required");
+          toast.error("Ngày sản xuất là bắt buộc");
           return false;
         }
         if (!formData.expiry_date) {
-          toast.error("Expiry date is required");
+          toast.error("Ngày hết hạn là bắt buộc");
           return false;
         }
-        // Validate dates
         if (formData.expiry_date <= formData.manufacture_date) {
-          toast.error("Expiry date must be after manufacture date");
+          toast.error("Ngày hết hạn phải sau ngày sản xuất");
           return false;
         }
         return true;
 
-      case 1: // Origin Details
+      case 1:
         if (!formData?.origin?.trim()) {
-          toast.error("Origin is required");
+          toast.error("Nguồn gốc là bắt buộc");
           return false;
         }
         if (!formData?.producer_name?.trim()) {
-          toast.error("Producer name is required");
+          toast.error("Tên nhà sản xuất là bắt buộc");
           return false;
         }
         return true;
@@ -125,7 +126,7 @@ const CreateProduct = () => {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image size should be less than 5MB");
+      toast.error("Kích thước ảnh phải nhỏ hơn 5MB");
       return;
     }
 
@@ -133,7 +134,7 @@ const CreateProduct = () => {
     reader.onloadend = () => {
       const base64 = reader.result as string;
       setFormData((prev) => ({ ...prev, image: base64 }));
-      toast.success("Image uploaded successfully!");
+      toast.success("Tải ảnh thành công!");
     };
     reader.readAsDataURL(file);
   };
@@ -150,9 +151,8 @@ const CreateProduct = () => {
   };
 
   const handleSubmit = async () => {
-    console.log("OLK");
     if (!validateStep(0) || !validateStep(1)) {
-      toast.error("Please complete all required fields");
+      toast.error("Vui lòng hoàn thành tất cả các trường bắt buộc");
       return;
     }
     setIsSubmitting(true);
@@ -160,28 +160,24 @@ const CreateProduct = () => {
 
     try {
       const productData = transformFormData();
-      console.log("Submitting product data:", formData);
 
-      const response = await mutateAsync(productData);
+      await mutateAsync(productData);
 
-      console.log("Product created successfully:", response);
       setIsSubmitted(true);
-      toast.success("Product created successfully!");
+      toast.success("Tạo sản phẩm thành công!");
 
-      // Redirect after showing success message
       setTimeout(() => {
         navigate("/products ");
       }, 2000);
     } catch (error: any) {
       console.error("Error creating product:", error);
 
-      // Handle different error types
       if (error.response?.data?.message) {
         toast.error(error.response.data.message);
       } else if (error.message) {
         toast.error(error.message);
       } else {
-        toast.error("Failed to create product. Please try again.");
+        toast.error("Tạo sản phẩm thất bại, vui lòng thử lại.");
       }
     } finally {
       setIsSubmitting(false);
@@ -196,21 +192,21 @@ const CreateProduct = () => {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <BackButton to={"/products"} title={"Back to products"} />
+      <BackButton to={"/products"} title={"Quay lại danh sách sản phẩm"} />
 
       <div>
-        <h1 className="text-3xl font-bold">Create New Batch</h1>
+        <h1 className="text-3xl font-bold">Tạo sản phẩm mới</h1>
         <p className="text-muted-foreground mt-1">
-          Add a new product to the system
+          Thêm sản phẩm mới vào hệ thống
         </p>
       </div>
 
-      {/* Progress Bar */}
       <ProgressBar
         steps={steps}
         progress={progress}
         currentStep={currentStep}
       />
+
       <motion.div
         className="relative group"
         initial={{ opacity: 0, y: 20 }}
@@ -218,7 +214,6 @@ const CreateProduct = () => {
       >
         <div className="absolute -inset-0.5 bg-linear-to-r from-primary/30 to-secondary/30 rounded-2xl opacity-0 group-hover:opacity-100 blur transition-opacity duration-500" />
         <div className="relative bg-glass-gradient backdrop-blur-xl border border-border/50 rounded-2xl p-8">
-          {/* Form Steps */}
           <CreateProductForm
             currentStep={currentStep}
             formData={formData}
@@ -228,6 +223,7 @@ const CreateProduct = () => {
             handleRemoveImage={handleRemoveImage}
             fileInputRef={fileInputRef}
           />
+
           <div className="flex justify-between mt-8 pt-6 border-t border-border/50">
             <Button
               variant="outline"
@@ -235,11 +231,12 @@ const CreateProduct = () => {
               disabled={currentStep === 0}
               className="gap-2"
             >
-              <ArrowLeft className="w-4 h-4" /> Back
+              <ArrowLeft className="w-4 h-4" /> Quay lại
             </Button>
+
             {currentStep < steps.length - 1 ? (
               <Button onClick={handleNext} className="gap-2">
-                Next <ArrowRight className="w-4 h-4" />
+                Tiếp tục <ArrowRight className="w-4 h-4" />
               </Button>
             ) : (
               <Button
@@ -249,11 +246,11 @@ const CreateProduct = () => {
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> Creating...
+                    <Loader2 className="w-4 h-4 animate-spin" /> Đang tạo...
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 className="w-4 h-4" /> Submit Product
+                    <CheckCircle2 className="w-4 h-4" /> Tạo sản phẩm
                   </>
                 )}
               </Button>

@@ -4,30 +4,27 @@ import { encodeFunctionData } from "viem";
 import { useState } from "react";
 import { FOOD_TRACE_ABI } from "@/config/contracts";
 import { FOOD_TRACE_CONTRACT_ADDRESS } from "@/config/accountKit";
-import { ethers } from "ethers";
 
-interface CreateBatchProps {
-  onchainProductId: string;
-  initialDataHash?: any;
+interface CreateProductProps {
+  name: string;
+  metadataUri: any;
 }
 
-export const useCreateBatchOnchain = () => {
+export const useCreateProductOnchain = () => {
   const { client } = useSmartAccountClient({});
   const { sendCallsAsync } = useSendCalls({ client });
   const [loading, setLoading] = useState(false);
 
-  const createBatch = async () => {
-    const hash = ethers.keccak256(ethers.toUtf8Bytes("batch-meta"));
+  const createProduct = async ({ name, metadataUri }: CreateProductProps) => {
     if (!client) throw new Error("Wallet not connected");
-    // if (!onchainProductId) throw new Error("Batch code is required");
 
     setLoading(true);
 
     try {
       const data = encodeFunctionData({
         abi: FOOD_TRACE_ABI,
-        functionName: "createBatch",
-        args: [BigInt(20), `${hash}` as any],
+        functionName: "createProduct",
+        args: [name, metadataUri],
       });
 
       const res = await sendCallsAsync({
@@ -44,5 +41,5 @@ export const useCreateBatchOnchain = () => {
     }
   };
 
-  return { createBatch, loading };
+  return { createProduct, loading };
 };

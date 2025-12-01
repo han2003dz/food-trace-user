@@ -10,7 +10,7 @@ import {
   type AlchemyAccountsUIConfig,
 } from "@account-kit/react";
 import { QueryClient } from "@tanstack/react-query";
-import { createPublicClient, toHex } from "viem";
+import { createPublicClient } from "viem";
 import { createBundlerClient } from "viem/account-abstraction";
 import { toUSDC } from "../utils/token";
 
@@ -72,7 +72,17 @@ export const uiConfig: AlchemyAccountsUIConfig = {
         //   scope: "openid profile",
         // },
       ],
-      [{ type: "external_wallets" }],
+      [
+        {
+          type: "external_wallets",
+          walletConnect: { projectId: "a5af302bdc17879bfe8b75296873bc90" },
+          wallets: ["wallet_connect", "metamask wallet"],
+          chainType: ["evm"],
+          moreButtonText: "Connect with wallet",
+          hideMoreButton: false,
+          numFeaturedWallets: 1,
+        },
+      ],
     ],
     addPasskeyOnSignup: false,
   },
@@ -109,8 +119,8 @@ export const accountKitConfig = createConfig(
     ssr: true,
     storage: cookieStorage,
     enablePopupOauth: true,
-    policyId: SPONSORSHIP_POLICY_ID,
-    policyToken,
+    // policyId: SPONSORSHIP_POLICY_ID,
+    // policyToken,
     sessionConfig: {
       expirationTimeMs: 1000 * 60 * 60, // 1 hour (defaults to 15 min)
     },
@@ -122,15 +132,15 @@ export const accountKitConfig = createConfig(
 export const queryClient = new QueryClient();
 
 // Paymaster Service Configuration
-export const paymasterServiceConfig = {
-  policyId: SPONSORSHIP_POLICY_ID,
-  erc20: {
-    tokenAddress: USDC_CONTRACT_ADDRESS,
-    postOpSettings: {
-      autoApprove: {
-        below: toHex(toUSDC(0.01)),
-        amount: toHex(toUSDC(10)),
-      },
-    },
-  },
-};
+// export const paymasterServiceConfig = {
+//   policyId: SPONSORSHIP_POLICY_ID,
+//   erc20: {
+//     tokenAddress: USDC_CONTRACT_ADDRESS,
+//     postOpSettings: {
+//       autoApprove: {
+//         below: toHex(toUSDC(0.01)),
+//         amount: toHex(toUSDC(10)),
+//       },
+//     },
+//   },
+// };

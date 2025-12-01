@@ -50,11 +50,11 @@ export const BasicInfo = ({
     >
       {/* Product Name */}
       <div className="space-y-2">
-        <Label htmlFor="name">Product Name *</Label>
+        <Label htmlFor="name">Tên sản phẩm *</Label>
         <Input
           id="name"
           name="name"
-          placeholder="e.g., Organic Tomatoes"
+          placeholder="e.g., Cà chua"
           value={formData.name}
           onChange={handleChangeFormData}
           className="bg-card/50"
@@ -63,17 +63,17 @@ export const BasicInfo = ({
 
       {/* Category */}
       <div className="space-y-2">
-        <Label htmlFor="category">Category *</Label>
+        <Label htmlFor="category">Loại sản phẩm *</Label>
         <Select
           value={formData.category || ""}
           onValueChange={(value) => handleChangeFormData("category", value)}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select category">
+            <SelectValue placeholder="Chọn loại sản phẩm">
               {formData.category
                 ? CATEGORIES.find((cat) => String(cat.id) === formData.category)
                     ?.name
-                : "Select category"}
+                : "Chọn loại sản phẩm"}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
@@ -88,7 +88,7 @@ export const BasicInfo = ({
 
       {/* Manufacture Date */}
       <div className="space-y-2">
-        <Label>Manufacture Date *</Label>
+        <Label>Ngày sản xuất *</Label>
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -121,7 +121,7 @@ export const BasicInfo = ({
 
       {/* Expiry Date */}
       <div className="space-y-2">
-        <Label>Expiry Date *</Label>
+        <Label>Ngày hết hạn *</Label>
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -152,7 +152,7 @@ export const BasicInfo = ({
 
       {/* Image */}
       <div className="space-y-2">
-        <Label>Product Image (Optional)</Label>
+        <Label>Ảnh sản phẩm (Optional)</Label>
 
         <input
           ref={fileInputRef}
@@ -197,7 +197,7 @@ export const BasicInfo = ({
 
       {/* Description */}
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">Mô tả</Label>
         <Textarea
           id="description"
           name="description"

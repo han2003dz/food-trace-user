@@ -1,12 +1,24 @@
 export const CATEGORIES = [
-  { id: 1, name: "Fruits", description: "Fresh and organic fruits" },
-  { id: 2, name: "Vegetables", description: "Green and healthy vegetables" },
+  { id: 1, name: "Trái cây", description: "Trái cây tươi và hữu cơ" },
+  { id: 2, name: "Rau củ", description: "Rau củ xanh và bổ dưỡng" },
   {
     id: 3,
-    name: "Meat & Seafood",
-    description: "High-quality meat and seafood",
+    name: "Thịt & Hải sản",
+    description: "Thịt và hải sản chất lượng cao",
   },
-  { id: 4, name: "Dairy Products", description: "Milk, cheese, and butter" },
-  { id: 5, name: "Beverages", description: "Juices, soda, and water" },
-  { id: 6, name: "Snacks", description: "Chips, cookies, and candies" },
+  {
+    id: 4,
+    name: "Sản phẩm từ sữa",
+    description: "Sữa, phô mai và bơ",
+  },
+  {
+    id: 5,
+    name: "Đồ uống",
+    description: "Nước ép, nước ngọt và nước tinh khiết",
+  },
+  {
+    id: 6,
+    name: "Đồ ăn nhẹ",
+    description: "Khoai tây chiên, bánh quy và kẹo",
+  },
 ];

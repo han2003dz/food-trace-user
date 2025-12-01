@@ -2,17 +2,15 @@ import {
   Package,
   CheckCircle2,
   Users,
-  Workflow,
   Search,
   Filter,
+  Home,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { MetricCard } from "@/components/common/MetricCard";
-import { useAuthStatus } from "@/hooks/useAuth";
-import { VerifyOwnershipModal } from "@/components/common/VerifyOwnershipModal";
 import { useGetTotalBatches } from "@/hooks/contracts/useBatches";
 import { useGetAllBatches } from "@/hooks/useBatch";
 import { useState } from "react";
@@ -31,7 +29,6 @@ const Dashboard = () => {
   const limit = 5;
   const [statusFilter, setStatusFilter] = useState("");
   const navigate = useNavigate();
-  const { isConnected, isAuthenticated } = useAuthStatus();
   const { totalBatches } = useGetTotalBatches();
 
   const { data, isLoading } = useGetAllBatches(page, limit, statusFilter);
@@ -43,7 +40,7 @@ const Dashboard = () => {
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground mt-1">
-            Track and manage your food supply chain
+            Theo dõi và quản lý chuỗi cung ứng thực phẩm của bạn
           </p>
         </div>
       </div>
@@ -51,29 +48,29 @@ const Dashboard = () => {
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
-          title="Total Batches"
-          value={totalBatches ?? 0}
+          title="Tổng số lô"
+          value={totalBatches ?? 1000}
           icon={Package}
           gradient="from-blue-500 to-cyan-500"
         />
         <MetricCard
-          title="Verified Transactions"
+          title="Tổng số sản phẩm"
           value={3849}
           icon={CheckCircle2}
           delay={0.1}
           gradient="from-green-500 to-emerald-500"
         />
         <MetricCard
-          title="Registered Producers"
+          title="Nhà sản xuất đã đăng ký"
           value={156}
-          icon={Users}
+          icon={Home}
           delay={0.2}
           gradient="from-purple-500 to-pink-500"
         />
         <MetricCard
-          title="Active Supply Chains"
-          value={89}
-          icon={Workflow}
+          title="Người truy cập"
+          value={200}
+          icon={Users}
           delay={0.3}
           gradient="from-orange-500 to-red-500"
         />
@@ -89,7 +86,7 @@ const Dashboard = () => {
         <div className="absolute -inset-0.5 bg-linear-to-r from-primary/30 to-secondary/30 rounded-2xl opacity-0 group-hover:opacity-100 blur transition-opacity duration-500" />
         <div className="relative bg-glass-gradient backdrop-blur-xl border border-border/50 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold">Recent Batches</h2>
+            <h2 className="text-xl font-semibold">Lô hàng mới nhất</h2>
           </div>
 
           <motion.div
@@ -100,7 +97,7 @@ const Dashboard = () => {
             <div className="relative flex-1 min-w-[300px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search batches..."
+                placeholder="Tìm kiếm..."
                 // value={searchQuery}
                 // onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-card/50 border-border/50"
@@ -110,7 +107,7 @@ const Dashboard = () => {
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[180px] bg-card/50 border-border/50">
                 <Filter className="w-4 h-4 mr-2" />
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder="Bộ lọc trạng thái" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="All">All Status</SelectItem>
@@ -133,19 +130,19 @@ const Dashboard = () => {
                 <thead>
                   <tr className="border-b border-border/50">
                     <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                      Batch Code
+                      Mã lô hàng
                     </th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                      Product
+                      Tên sản phẩm
                     </th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                      Owner
+                      Chủ sở hữu
                     </th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                      Status
+                      Trạng thái
                     </th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                      Timestamp
+                      Thời gian
                     </th>
                   </tr>
                 </thead>
@@ -228,8 +225,6 @@ const Dashboard = () => {
           <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" />
         </Button>
       </motion.div>
-
-      {isConnected && !isAuthenticated && <VerifyOwnershipModal />}
     </div>
   );
 };

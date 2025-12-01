@@ -1,10 +1,5 @@
 import { api } from "@/config/api";
 import type { Address } from "viem";
-
-interface NonceResponse {
-  nonce: string;
-}
-
 interface LoginRequest {
   wallet_address: Address;
   signature: string;
@@ -25,7 +20,7 @@ interface LoginResponse {
 
 export const getNonce = async (address: Address) => {
   const res = await api().get(`/auth/nonce`, { params: { address } });
-  return res.data as NonceResponse;
+  return res.data;
 };
 
 export const login = async (params: LoginRequest): Promise<LoginResponse> => {

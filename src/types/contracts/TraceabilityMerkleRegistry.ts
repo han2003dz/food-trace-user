@@ -40,6 +40,7 @@ export interface TraceabilityMerkleRegistryInterface extends Interface {
       | "createBatch"
       | "createProduct"
       | "eventsById"
+      | "getBatch"
       | "getBatchEvents"
       | "hasRole"
       | "nextBatchId"
@@ -52,6 +53,7 @@ export interface TraceabilityMerkleRegistryInterface extends Interface {
       | "recordTraceEvent"
       | "roles"
       | "setRoles"
+      | "transferBatch"
       | "transferOwnership"
       | "unpause"
       | "verifyWithRoot"
@@ -127,6 +129,10 @@ export interface TraceabilityMerkleRegistryInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getBatch",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getBatchEvents",
     values: [BigNumberish]
   ): string;
@@ -161,6 +167,10 @@ export interface TraceabilityMerkleRegistryInterface extends Interface {
   encodeFunctionData(
     functionFragment: "setRoles",
     values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "transferBatch",
+    values: [BigNumberish, AddressLike, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
@@ -222,6 +232,7 @@ export interface TraceabilityMerkleRegistryInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "eventsById", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getBatch", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getBatchEvents",
     data: BytesLike
@@ -249,6 +260,10 @@ export interface TraceabilityMerkleRegistryInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "roles", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "setRoles", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "transferBatch",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
@@ -556,6 +571,22 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
     "view"
   >;
 
+  getBatch: TypedContractMethod<
+    [batchId: BigNumberish],
+    [
+      [bigint, string, string, string, boolean, boolean, string] & {
+        productId: bigint;
+        creator: string;
+        currentOwner: string;
+        initialDataHash: string;
+        exists: boolean;
+        closed: boolean;
+        pendingReceiver: string;
+      }
+    ],
+    "view"
+  >;
+
   getBatchEvents: TypedContractMethod<
     [batchId: BigNumberish],
     [bigint[]],
@@ -608,6 +639,17 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
 
   setRoles: TypedContractMethod<
     [account: AddressLike, newRoles: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  transferBatch: TypedContractMethod<
+    [
+      batchId: BigNumberish,
+      to: AddressLike,
+      eventType: BigNumberish,
+      description: string
+    ],
     [void],
     "nonpayable"
   >;
@@ -719,6 +761,23 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "getBatch"
+  ): TypedContractMethod<
+    [batchId: BigNumberish],
+    [
+      [bigint, string, string, string, boolean, boolean, string] & {
+        productId: bigint;
+        creator: string;
+        currentOwner: string;
+        initialDataHash: string;
+        exists: boolean;
+        closed: boolean;
+        pendingReceiver: string;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "getBatchEvents"
   ): TypedContractMethod<[batchId: BigNumberish], [bigint[]], "view">;
   getFunction(
@@ -779,6 +838,18 @@ export interface TraceabilityMerkleRegistry extends BaseContract {
     nameOrSignature: "setRoles"
   ): TypedContractMethod<
     [account: AddressLike, newRoles: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "transferBatch"
+  ): TypedContractMethod<
+    [
+      batchId: BigNumberish,
+      to: AddressLike,
+      eventType: BigNumberish,
+      description: string
+    ],
     [void],
     "nonpayable"
   >;

@@ -20,16 +20,17 @@ import {
   useSidebar,
 } from "../ui/Sidebar";
 import { useEffect, useMemo } from "react";
-import { useAuthStatus } from "@/hooks/useAuth";
+import { selectWalletAddress, useAuthStore } from "@/stores/useAuthStore";
 
+// 🔥 Dịch label sang tiếng Việt (trừ Dashboard)
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: Users, label: "Organizations", path: "/organizations" },
-  { icon: Package, label: "Batches", path: "/batches" },
-  { icon: Atom, label: "Transfer", path: "/transfer" },
-  { icon: ShoppingBag, label: "Products", path: "/products" },
-  { icon: Users, label: "Roles", path: "/roles" },
-  { icon: Settings, label: "Settings", path: "/settings" },
+  { icon: Users, label: "Tổ chức", path: "/organizations" },
+  { icon: ShoppingBag, label: "Sản phẩm", path: "/products" },
+  { icon: Package, label: "Lô hàng", path: "/batches" },
+  { icon: Atom, label: "Chuyển giao", path: "/transfer" },
+  { icon: Users, label: "Vai trò", path: "/roles" },
+  { icon: Settings, label: "Cài đặt", path: "/settings" },
 ];
 
 const minimalNav = [{ icon: LayoutDashboard, label: "Dashboard", path: "/" }];
@@ -42,15 +43,17 @@ export const Sidebar = ({ setSidebarClosed }: SidebarProps) => {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
   const location = useLocation();
-  const { isAuthenticated } = useAuthStatus();
+  const walletAddress = useAuthStore(selectWalletAddress);
+
+  const isConnected = Boolean(walletAddress);
 
   useEffect(() => {
     setSidebarClosed(isCollapsed);
   }, [isCollapsed, setSidebarClosed]);
 
   const displayedNav = useMemo(() => {
-    return isAuthenticated ? navItems : minimalNav;
-  }, [isAuthenticated]);
+    return isConnected ? navItems : minimalNav;
+  }, [isConnected]);
 
   return (
     <SidebarPrimitive
@@ -72,7 +75,7 @@ export const Sidebar = ({ setSidebarClosed }: SidebarProps) => {
                 FoodTrace
               </h1>
               <p className="text-xs text-muted-foreground mt-1">
-                Blockchain Traceability
+                Blockchain traceability
               </p>
             </>
           )}
@@ -86,7 +89,10 @@ export const Sidebar = ({ setSidebarClosed }: SidebarProps) => {
           <SidebarGroupContent>
             <SidebarMenu>
               {displayedNav.map((item) => {
-                const isActive = location.pathname === item.path;
+                const isActive =
+                  location.pathname === item.path ||
+                  location.pathname.startsWith(item.path + "/");
+
                 const Icon = item.icon;
 
                 return (

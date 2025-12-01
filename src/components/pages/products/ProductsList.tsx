@@ -50,14 +50,14 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Product Management</h1>
+          <h1 className="text-3xl font-bold">Quản lý sản phẩm</h1>
           <p className="text-muted-foreground mt-1">
-            Manage all your products in the system
+            Quản lý tất cả sản phẩm của bạn trên hệ thống
           </p>
         </div>
         <Button onClick={() => navigate("/products/create")} className="gap-2">
           <Plus className="w-4 h-4" />
-          Create Product
+          Tạo sản phẩm
         </Button>
       </div>
 
@@ -70,7 +70,7 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
         <div className="relative flex-1 min-w-[300px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search products..."
+            placeholder="Tìm kiếm sản phẩm..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 bg-card/50 border-border/50"
@@ -83,7 +83,7 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
             <SelectValue placeholder="Filter by category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="all">Tất cả</SelectItem>
             {CATEGORIES.map((cat) => (
               <SelectItem key={cat.id} value={String(cat.id)}>
                 {cat.name}
@@ -118,7 +118,7 @@ export const ProductList = ({ products, isLoading }: ProductListProps) => {
               className="gap-2"
             >
               <Plus className="w-4 h-4" />
-              Create First Product
+              Tạo sản phẩm đầu tiên
             </Button>
           )}
         </motion.div>

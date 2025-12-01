@@ -1,46 +1,45 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { persist } from "zustand/middleware";
 import { createWithEqualityFn } from "zustand/traditional";
 import { useShallow } from "zustand/react/shallow";
-
-import { isEqual } from "lodash";
-import { type IUser, type IUserAuth } from "@/types/auth";
-import { StorageStoreName } from "@/constants/storage";
-
-export const deepCompareState = (oldState: unknown, newState: unknown) =>
-  isEqual(oldState, newState);
+import { StorageStoreName } from "../constants/storage";
+import type { IUser } from "@/types/auth";
 
 interface UserState {
-  auth: IUserAuth | null;
   userDetail: IUser | null;
-  setAuth: (user: IUserAuth | null) => void;
   setUserDetail: (detail: IUser | null) => void;
-  updateUserDetail: (detail: Partial<IUser>) => void;
-  hasSignedMessage: () => boolean;
+  updateUserDetail: (partial: Partial<IUser>) => void;
+  resetUser: () => void;
 }
 
-const useUserStore = createWithEqualityFn<UserState>()(
+export const useUserStore = createWithEqualityFn<UserState>()(
   persist(
-    (set, get) => ({
-      auth: null,
+    (set) => ({
       userDetail: null,
-      setAuth: (auth) => set({ auth }),
+
       setUserDetail: (userDetail) => set({ userDetail }),
+
       updateUserDetail: (partial) =>
-        set((state) => ({
-          userDetail: state.userDetail
-            ? { ...state.userDetail, ...partial }
-            : null,
-        })),
-      hasSignedMessage: () => Boolean(get().auth?.tokens?.accessToken),
+        set((state) => {
+          if (!state.userDetail) return { userDetail: null };
+          return {
+            userDetail: {
+              ...state.userDetail,
+              ...Object.fromEntries(
+                Object.entries(partial).filter(([_, v]) => v !== undefined)
+              ),
+            },
+          };
+        }),
+
+      resetUser: () => set({ userDetail: null }),
     }),
     {
       name: StorageStoreName.USER,
+      partialize: (state) => ({ userDetail: state.userDetail }),
     }
-  ),
-  deepCompareState
+  )
 );
 
-export default useUserStore;
-
-export const useUserShallow = <U>(selector: (state: UserState) => U) =>
+export const useUserShallow = <U>(selector: (s: UserState) => U) =>
   useUserStore(useShallow(selector));

@@ -26,12 +26,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/Dialog";
-import {
-  useCreateOrganization,
-  useGetOrganizationByUser,
-} from "@/hooks/useOrganizations";
-import useUserStore from "@/stores/useUserStore";
+import { useCreateOrganization } from "@/hooks/useOrganizations";
 import { ORG_TYPE_ROLES, type OrgType } from "@/types/org";
+import { useUserStore } from "@/stores/useUserStore";
+import { useRefreshUserProfile } from "@/hooks/useRefetchUser";
 
 export default function CreateOrganization() {
   const navigate = useNavigate();
@@ -39,35 +37,41 @@ export default function CreateOrganization() {
   const { mutate: createOrg, isPending: isSubmitting } =
     useCreateOrganization();
 
-  const { data: organization } = useGetOrganizationByUser();
+  const { refreshUserProfile } = useRefreshUserProfile();
   const { userDetail } = useUserStore();
   const [formData, setFormData] = useState({
     name: "",
     org_type: "" as OrgType | "",
     metadata_uri: "",
+    location: "",
   });
 
   const [errors, setErrors] = useState({
     name: "",
     org_type: "",
+    location: "",
   });
 
   const validateForm = () => {
     const newErrors = {
       name: "",
       org_type: "",
+      location: "",
     };
 
     if (!formData.name.trim()) {
-      newErrors.name = "Organization name is required";
+      newErrors.name = "Tên tổ chức là bắt buộc";
     }
 
     if (!formData.org_type) {
-      newErrors.org_type = "Please select an organization type";
+      newErrors.org_type = "Vui lòng chọn loại tổ chức";
     }
 
+    if (!formData.location) {
+      newErrors.location = "Địa điểm là bắt buộc";
+    }
     setErrors(newErrors);
-    return !newErrors.name && !newErrors.org_type;
+    return !newErrors.name && !newErrors.org_type && !newErrors.location;
   };
 
   const handleSubmit = () => {
@@ -78,15 +82,17 @@ export default function CreateOrganization() {
         name: formData.name,
         org_type: formData.org_type,
         metadata_uri: formData.metadata_uri || undefined,
+        location: formData.location,
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           setShowSuccessModal(true);
+          await refreshUserProfile();
         },
         onError: (error: any) => {
           console.error("error", error);
           toast.error(
-            error?.response?.data?.message || "Failed to create organization."
+            error?.response?.data?.message || "Tạo tổ chức thất bại."
           );
         },
       }
@@ -109,27 +115,28 @@ export default function CreateOrganization() {
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <Building2 className="w-8 h-8 text-primary" />
             {userDetail?.role === "CUSTOMER"
-              ? "Create Organization"
-              : "Organization"}
+              ? "Tạo tổ chức"
+              : "Tổ chức của bạn"}
           </h1>
           <p className="text-muted-foreground mt-1">
             {userDetail?.role === "CUSTOMER"
-              ? "Register your organization on FoodTrace system"
-              : "Your organization on FoodTrace system"}
+              ? "Đăng ký tổ chức của bạn trên hệ thống FoodTrace"
+              : "Thông tin tổ chức trên hệ thống FoodTrace"}
           </p>
         </div>
       </div>
+
       {userDetail?.role === "CONSUMER" ? (
         <>
           <div className="backdrop-blur-xl bg-card/50 border border-border/50 rounded-xl p-8 space-y-6">
             {/* Organization Name */}
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium">
-                Organization Name *
+                Tên tổ chức *
               </Label>
               <Input
                 id="name"
-                placeholder="GreenFarm Cooperative"
+                placeholder="Hợp tác xã GreenFarm"
                 value={formData.name}
                 onChange={(e) => {
                   setFormData({ ...formData, name: e.target.value });
@@ -142,10 +149,29 @@ export default function CreateOrganization() {
               )}
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="location" className="text-sm font-medium">
+                Địa điểm *
+              </Label>
+              <Input
+                id="location"
+                placeholder="Hà Nội - Việt Nam"
+                value={formData.location}
+                onChange={(e) => {
+                  setFormData({ ...formData, location: e.target.value });
+                  setErrors({ ...errors, location: "" });
+                }}
+                className={errors.location ? "border-destructive" : ""}
+              />
+              {errors.location && (
+                <p className="text-destructive text-sm">{errors.location}</p>
+              )}
+            </div>
+
             {/* Organization Type */}
             <div className="space-y-2">
               <Label htmlFor="org_type" className="text-sm font-medium">
-                Organization Type *
+                Loại tổ chức *
               </Label>
               <Select
                 value={formData.org_type}
@@ -157,13 +183,16 @@ export default function CreateOrganization() {
                 <SelectTrigger
                   className={errors.org_type ? "border-destructive" : ""}
                 >
-                  <SelectValue placeholder="Select organization type" />
+                  <SelectValue placeholder="Chọn loại tổ chức" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="PRODUCER">🏭 PRODUCER</SelectItem>
-                  <SelectItem value="LOGISTICS">🚚 LOGISTICS</SelectItem>
-                  <SelectItem value="RETAILER">🏪 RETAILER</SelectItem>
-                  <SelectItem value="AUDITOR">🔍 AUDITOR</SelectItem>
+                  <SelectItem value="PRODUCER">🏭 Nhà sản xuất</SelectItem>
+                  <SelectItem value="PROCESSOR">⚙️ Nhà chế biến</SelectItem>
+                  <SelectItem value="TRANSPORTER">
+                    🚚 Đơn vị vận chuyển
+                  </SelectItem>
+                  <SelectItem value="RETAILER">🏪 Nhà bán lẻ</SelectItem>
+                  <SelectItem value="AUDITOR">🔍 Đơn vị kiểm định</SelectItem>
                 </SelectContent>
               </Select>
               {errors.org_type && (
@@ -178,7 +207,7 @@ export default function CreateOrganization() {
                   <Shield className="w-5 h-5 text-primary mt-0.5" />
                   <div>
                     <p className="font-medium text-sm">
-                      Role Preview: {ORG_TYPE_ROLES[formData.org_type].label}
+                      Quyền hạn: {ORG_TYPE_ROLES[formData.org_type].label}
                     </p>
                     <p className="text-muted-foreground text-sm mt-1">
                       {ORG_TYPE_ROLES[formData.org_type].description}
@@ -188,11 +217,11 @@ export default function CreateOrganization() {
               </div>
             )}
 
-            {/* Metadata URI (Optional) */}
+            {/* Metadata URI */}
             <div className="space-y-2">
               <Label htmlFor="metadata_uri" className="text-sm font-medium">
                 Metadata URI{" "}
-                <span className="text-muted-foreground">(optional)</span>
+                <span className="text-muted-foreground">(tuỳ chọn)</span>
               </Label>
               <Input
                 id="metadata_uri"
@@ -203,7 +232,7 @@ export default function CreateOrganization() {
                 }
               />
               <p className="text-muted-foreground text-xs">
-                Store additional organization metadata on IPFS
+                Lưu trữ metadata mở rộng trên IPFS
               </p>
             </div>
 
@@ -218,12 +247,12 @@ export default function CreateOrganization() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Creating...
+                    Đang tạo...
                   </>
                 ) : (
                   <>
                     <Building2 className="w-5 h-5" />
-                    Create Organization
+                    Tạo tổ chức
                   </>
                 )}
               </Button>
@@ -240,19 +269,19 @@ export default function CreateOrganization() {
                   </div>
                 </div>
                 <DialogTitle className="text-center text-2xl">
-                  Organization Registered Successfully!
+                  Đăng ký tổ chức thành công!
                 </DialogTitle>
                 <DialogDescription className="text-center">
-                  Your organization has been added to FoodTrace and registered
+                  Tổ chức của bạn đã được thêm vào FoodTrace và ghi nhận
                   on-chain.
                 </DialogDescription>
               </DialogHeader>
               <div className="flex flex-col gap-3 mt-4">
                 <Button
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate("/organizations")}
                   className="w-full bg-linear-to-r from-primary to-secondary"
                 >
-                  Continue to Dashboard
+                  Tiếp tục đến trang tổ chức
                 </Button>
               </div>
             </DialogContent>
@@ -261,87 +290,55 @@ export default function CreateOrganization() {
       ) : (
         <>
           <div className="backdrop-blur-xl bg-card/50 border border-border/50 rounded-xl p-8 space-y-6">
-            {/* Organization Name */}
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium">
-                Organization Name *
+                Tên tổ chức *
               </Label>
               <Input
                 id="name"
-                placeholder="GreenFarm Cooperative"
-                value={organization?.name}
-                onChange={(e) => {
-                  setFormData({ ...formData, name: e.target.value });
-                  setErrors({ ...errors, name: "" });
-                }}
-                className={errors.name ? "border-destructive" : ""}
+                value={userDetail?.organization?.name}
                 readOnly
               />
-              {errors.name && (
-                <p className="text-destructive text-sm">{errors.name}</p>
-              )}
             </div>
 
-            {/* Organization Type */}
             <div className="space-y-2">
-              <Label htmlFor="org_type" className="text-sm font-medium">
-                Organization Type *
-              </Label>
-              <Select value={organization?.org_type}>
-                <SelectTrigger
-                  className={errors.org_type ? "border-destructive" : ""}
-                >
-                  <SelectValue placeholder="Select organization type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PRODUCER">🏭 PRODUCER</SelectItem>
-                  <SelectItem value="LOGISTICS">🚚 LOGISTICS</SelectItem>
-                  <SelectItem value="RETAILER">🏪 RETAILER</SelectItem>
-                  <SelectItem value="AUDITOR">🔍 AUDITOR</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.org_type && (
-                <p className="text-destructive text-sm">{errors.org_type}</p>
-              )}
-            </div>
-
-            {/* Role Preview */}
-            {formData.org_type && (
-              <div className="p-4 rounded-lg bg-linear-to-r from-primary/10 to-secondary/10 border border-primary/20">
-                <div className="flex items-start gap-3">
-                  <Shield className="w-5 h-5 text-primary mt-0.5" />
-                  <div>
-                    <p className="font-medium text-sm">
-                      Role Preview: {ORG_TYPE_ROLES[formData.org_type].label}
-                    </p>
-                    <p className="text-muted-foreground text-sm mt-1">
-                      {ORG_TYPE_ROLES[formData.org_type].description}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Metadata URI (Optional) */}
-            <div className="space-y-2">
-              <Label htmlFor="metadata_uri" className="text-sm font-medium">
-                Metadata URI{" "}
-                <span className="text-muted-foreground">(optional)</span>
+              <Label htmlFor="location" className="text-sm font-medium">
+                Địa điểm *
               </Label>
               <Input
-                id="metadata_uri"
-                placeholder="ipfs://Qm..."
-                value={formData.metadata_uri}
-                onChange={(e) =>
-                  setFormData({ ...formData, metadata_uri: e.target.value })
-                }
+                id="location"
+                value={userDetail?.organization?.location}
+                readOnly
               />
-              <p className="text-muted-foreground text-xs">
-                Store additional organization metadata on IPFS
-              </p>
             </div>
 
-            {/* Submit Button */}
+            <div className="space-y-2">
+              <Label htmlFor="org_type" className="text-sm font-medium">
+                Loại tổ chức *
+              </Label>
+              <Select value={userDetail?.organization?.org_type}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PRODUCER">🏭 Nhà sản xuất</SelectItem>
+                  <SelectItem value="PROCESSOR">⚙️ Nhà chế biến</SelectItem>
+                  <SelectItem value="TRANSPORTER">
+                    🚚 Đơn vị vận chuyển
+                  </SelectItem>
+                  <SelectItem value="RETAILER">🏪 Nhà bán lẻ</SelectItem>
+                  <SelectItem value="AUDITOR">🔍 Đơn vị kiểm định</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="metadata_uri" className="text-sm font-medium">
+                Metadata URI (tuỳ chọn)
+              </Label>
+              <Input id="metadata_uri" placeholder="ipfs://Qm..." />
+            </div>
+
             <div className="flex justify-end pt-6 border-t border-border/50">
               <Button
                 onClick={handleSubmit}
@@ -352,19 +349,18 @@ export default function CreateOrganization() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Updating...
+                    Đang cập nhật...
                   </>
                 ) : (
                   <>
                     <Building2 className="w-5 h-5" />
-                    Update Organization
+                    Cập nhật tổ chức
                   </>
                 )}
               </Button>
             </div>
           </div>
 
-          {/* Success Modal */}
           <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
@@ -374,10 +370,10 @@ export default function CreateOrganization() {
                   </div>
                 </div>
                 <DialogTitle className="text-center text-2xl">
-                  Organization Registered Successfully!
+                  Cập nhật thành công!
                 </DialogTitle>
                 <DialogDescription className="text-center">
-                  Your organization has been added to FoodTrace and registered
+                  Thông tin tổ chức của bạn đã được cập nhật và ghi nhận
                   on-chain.
                 </DialogDescription>
               </DialogHeader>
@@ -386,14 +382,13 @@ export default function CreateOrganization() {
                   onClick={() => navigate("/")}
                   className="w-full bg-linear-to-r from-primary to-secondary"
                 >
-                  Continue to Dashboard
+                  Về trang tổng quan
                 </Button>
               </div>
             </DialogContent>
           </Dialog>
         </>
       )}
-      {/* Main Form Card */}
     </div>
   );
 }

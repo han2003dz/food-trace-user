@@ -22,11 +22,9 @@ export const CreateProductNoti = () => {
           transition={{ delay: 0.4 }}
         >
           <h2 className="text-3xl font-bold bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Product Created Successfully!
+            Sản phẩm đã được tạo thành công!
           </h2>
-          <p className="text-muted-foreground mt-2">
-            Redirecting to product management...
-          </p>
+          <p className="text-muted-foreground mt-2">Đang trở lại...</p>
         </motion.div>
       </div>
     </motion.div>

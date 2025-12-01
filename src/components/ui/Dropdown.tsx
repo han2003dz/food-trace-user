@@ -44,7 +44,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
       </div>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-48 origin-top-right bg-glass-gradient shadow-lg ring-1 ring-black ring-opacity-5 animate-in fade-in slide-in-from-top-2 rounded-2xl">
+        <div className="z-40 absolute right-0 bg-black mt-2 w-48 origin-top-right shadow-lg ring-1 ring-black ring-opacity-5 animate-in fade-in slide-in-from-top-2 rounded-2xl">
           <div className="py-3 px-2">
             {items.map((item, index) => (
               <button

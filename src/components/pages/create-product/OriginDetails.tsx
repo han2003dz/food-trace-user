@@ -19,7 +19,7 @@ export const OriginDetails = ({
       className="space-y-6"
     >
       <div className="space-y-2">
-        <Label htmlFor="producer_name">Producer Name *</Label>
+        <Label htmlFor="producer_name">Nhà sản xuất *</Label>
         <Input
           id="producer_name"
           name="producer_name"
@@ -27,15 +27,16 @@ export const OriginDetails = ({
           value={formData.producer_name}
           onChange={handleChangeFormData}
           className="bg-card/50"
+          readOnly
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="origin">Origin *</Label>
+        <Label htmlFor="origin">Nơi sản xuất *</Label>
         <Input
           id="origin"
           name="origin"
-          placeholder="e.g., California, USA"
+          placeholder="e.g., Hà Nội-Việt Nam"
           value={formData.origin}
           onChange={handleChangeFormData}
           className="bg-card/50"
